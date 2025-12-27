@@ -1,0 +1,16 @@
+header {
+    padding: 12px;
+    background: #222;
+    color: #fff;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    ;
+}
+
+a {
+    color: #fff;
+    margin-left: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}

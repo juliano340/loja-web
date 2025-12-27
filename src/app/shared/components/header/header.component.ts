@@ -11,20 +11,12 @@ import { RouterLink } from '@angular/router';
   template: `
     <header>
       <a routerLink="/products">Produtos</a>
-      <a routerLink="/cart">🛒 {{ cart.totalItems() }}</a>
+      <a routerLink="/cart">
+        🛒 {{ cart.totalItems() }} itens — R$ {{ cart.totalPrice().toFixed(2) }}
+      </a>
     </header>
   `,
-  styles: [
-    `
-      header {
-        padding: 12px;
-        background: #222;
-        color: #fff;
-        display: flex;
-        justify-content: flex-end;
-      }
-    `,
-  ],
+  styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent {
   constructor(public cart: CartService) {}

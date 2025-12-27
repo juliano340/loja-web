@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Product } from '../../features/products/products.service';
+import { Product } from './products.service';
 
 export interface CartItem {
   product: Product;
@@ -16,6 +16,14 @@ export class CartService {
 
   readonly totalItems = computed(() => this._items().reduce((acc, item) => acc + item.quantity, 0));
 
+  // ✅ NOVO: total em valor
+  readonly totalPrice = computed(() =>
+    this._items().reduce((acc, item) => {
+      const price = Number(item.product.price);
+      return acc + price * item.quantity;
+    }, 0)
+  );
+
   add(product: Product) {
     const items = this._items();
     const existing = items.find((i) => i.product.id === product.id);
@@ -26,12 +34,10 @@ export class CartService {
     } else {
       this._items.set([...items, { product, quantity: 1 }]);
     }
-
-    console.log('Carrinho atual:', this._items());
   }
 
   remove(productId: number) {
-    this._items.set(this._items().filter((i) => i.product.id !== productId.toString()));
+    this._items.set(this._items().filter((i) => i.product.id !== productId));
   }
 
   clear() {
