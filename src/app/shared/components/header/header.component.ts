@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -12,10 +13,13 @@ import { AuthService } from '../../../core/services/auth.service';
       <a routerLink="/products">Produtos</a>
       <a routerLink="/cart">🛒 {{ cart.totalItems() }}</a>
 
-      @if (auth.isAuthenticated()) {
+      @if (auth.loadingUser()) {
+      <span>Carregando...</span>
+      } @else if (auth.isAuthenticated()) {
       <span class="user"> Olá, {{ auth.user()?.name }} </span>
 
       <a routerLink="/orders">Meus pedidos</a>
+      <a routerLink="/profile">Perfil</a>
 
       <button (click)="logout()">Sair</button>
       } @else {
@@ -55,9 +59,10 @@ import { AuthService } from '../../../core/services/auth.service';
   ],
 })
 export class HeaderComponent {
-  constructor(public cart: CartService, public auth: AuthService) {}
+  constructor(public cart: CartService, public auth: AuthService, private router: Router) {}
 
   logout() {
     this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

@@ -54,7 +54,10 @@ export class RegisterPage {
     if (this.password !== this.confirmPassword) return;
 
     this.auth.register(this.name, this.email, this.password).subscribe({
-      next: () => this.router.navigate(['/products']),
+      next: () => {
+        alert('Cadastro realizado! Faça login.');
+        this.router.navigate(['/login']);
+      },
       error: (err) => {
         console.error(err);
         alert('Erro ao cadastrar');

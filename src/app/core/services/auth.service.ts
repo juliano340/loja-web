@@ -28,11 +28,23 @@ export class AuthService {
 
   readonly user = this._user.asReadonly();
 
+  private readonly _loadingUser = signal(false);
+  readonly loadingUser = this._loadingUser.asReadonly();
+
   constructor(private http: HttpClient) {}
+
   loadMe() {
+    this._loadingUser.set(true);
+
     return this.http.get<User>('http://localhost:3000/users/me').subscribe({
-      next: (user) => this._user.set(user),
-      error: () => this.logout(),
+      next: (user) => {
+        this._user.set(user);
+        this._loadingUser.set(false);
+      },
+      error: () => {
+        this.logout();
+        this._loadingUser.set(false);
+      },
     });
   }
 
@@ -49,19 +61,23 @@ export class AuthService {
   }
 
   register(name: string, email: string, password: string) {
-    return this.http
-      .post<{ access_token: string }>(`${this.apiUrl}/users`, { name, email, password })
-      .pipe(
-        tap((res) => {
-          this._token.set(res.access_token);
-          localStorage.setItem('token', res.access_token);
-          this.loadMe();
-        })
-      );
+    return this.http.post(`${this.apiUrl}/users`, { name, email, password });
   }
 
   logout() {
     this._token.set(null);
+    this._user.set(null);
     localStorage.removeItem('token');
+  }
+
+  updateMe(data: { name: string; email: string }) {
+    return this.http.patch<User>('http://localhost:3000/users/me', data).subscribe({
+      next: (user) => {
+        this._user.set(user);
+      },
+    });
+  }
+  changePassword(data: { currentPassword: string; newPassword: string }) {
+    return this.http.patch('http://localhost:3000/users/me/password', data);
   }
 }

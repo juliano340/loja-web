@@ -16,7 +16,6 @@ export class CartService {
 
   readonly totalItems = computed(() => this._items().reduce((acc, item) => acc + item.quantity, 0));
 
-  // ✅ NOVO: total em valor
   readonly totalPrice = computed(() =>
     this._items().reduce((acc, item) => {
       const price = Number(item.product.price);
