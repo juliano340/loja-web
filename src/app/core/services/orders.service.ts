@@ -2,9 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-interface CreateOrderItem {
-  productId: number;
+export interface OrderItem {
+  productName: string;
   quantity: number;
+  unitPrice: string;
+}
+
+export interface Order {
+  id: number;
+  total: string;
+  status: string;
+  createdAt: string;
+  items: OrderItem[];
 }
 
 @Injectable({
@@ -15,7 +24,11 @@ export class OrdersService {
 
   constructor(private http: HttpClient) {}
 
-  create(items: CreateOrderItem[]): Observable<any> {
+  findMyOrders() {
+    return this.http.get<Order[]>(`${this.apiUrl}/my`);
+  }
+
+  create(items: { productId: number; quantity: number }[]) {
     return this.http.post(this.apiUrl, { items });
   }
 }
