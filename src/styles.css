@@ -1,21 +1,30 @@
 @import "tailwindcss";
 
+/* =========================
+   BASE
+========================= */
 @layer base {
     body {
         @apply bg-gray-50 text-gray-900;
     }
 }
 
+/* =========================
+   COMPONENTS
+========================= */
 @layer components {
+
+    /* ---------- PAGE ---------- */
     .page {
         @apply min-h-screen flex items-start justify-center pt-10 px-4 sm:px-6;
     }
 
-
+    /* ---------- CARD ---------- */
     .card {
         @apply bg-white border border-gray-200 rounded-lg p-6 w-full max-w-md;
     }
 
+    /* ---------- FORM ---------- */
     .form {
         @apply space-y-4;
     }
@@ -26,5 +35,68 @@
 
     .btn-primary {
         @apply w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition;
+    }
+
+    /* =========================
+   HEADER (FINAL DEFINITIVO)
+========================= */
+
+    .header {
+        @apply w-full bg-white border-b border-gray-200;
+    }
+
+    .header-container {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between relative;
+    }
+
+    /* ESQUERDA */
+    .header-title {
+        @apply text-base font-semibold text-gray-900;
+    }
+
+    /* DIREITA */
+    .header-right {
+        @apply flex items-center gap-4;
+    }
+
+    /* MENU DESKTOP */
+    .header-nav {
+        @apply hidden md:flex items-center gap-6 h-8;
+    }
+
+    .header-link {
+        @apply text-sm font-medium text-gray-700 hover:text-blue-600 transition leading-none flex items-center h-8;
+    }
+
+    /* BOTÕES / ÍCONES */
+    .icon-btn {
+        @apply flex items-center justify-center h-8 w-8 rounded-md text-gray-700 hover:bg-gray-100 transition;
+    }
+
+    /* BADGE DO CARRINHO */
+    .cart-badge {
+        @apply absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center;
+    }
+
+    /* MENU MOBILE */
+    .mobile-menu {
+        @apply absolute top-14 left-0 w-full bg-white border-b border-gray-200 shadow-md z-50;
+    }
+
+    .mobile-menu-item {
+        @apply block px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100;
+    }
+
+
+    /* =========================
+     MOBILE MENU
+  ========================= */
+
+    .mobile-menu {
+        @apply absolute top-14 left-0 w-full bg-white border-b border-gray-200 shadow-md z-50;
+    }
+
+    .menu-item {
+        @apply block px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100;
     }
 }
