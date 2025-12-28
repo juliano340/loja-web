@@ -26,7 +26,6 @@ export class CartService {
   );
 
   constructor() {
-    // ✅ Persistência automática
     effect(() => {
       const items = this._items();
       try {
@@ -37,34 +36,45 @@ export class CartService {
     });
   }
 
-  add(product: Product) {
+  /**
+   * ✅ Agora aceita quantidade (default 1)
+   * - add(product) -> +1 (compatível com ProductCard atual)
+   * - add(product, qty) -> +qty (ProductPage)
+   */
+  add(product: Product, quantity: number = 1) {
+    const qty = this.sanitizeQty(quantity);
+
     const items = this._items();
     const existing = items.find((i) => i.product.id === product.id);
 
     if (existing) {
-      existing.quantity++;
+      existing.quantity += qty;
       this._items.set([...items]);
       return;
     }
 
-    this._items.set([...items, { product, quantity: 1 }]);
+    this._items.set([...items, { product, quantity: qty }]);
   }
 
-  increase(productId: number) {
+  increase(productId: number, quantity: number = 1) {
+    const qty = this.sanitizeQty(quantity);
+
     const items = this._items();
     const existing = items.find((i) => i.product.id === productId);
     if (!existing) return;
 
-    existing.quantity++;
+    existing.quantity += qty;
     this._items.set([...items]);
   }
 
-  decrease(productId: number) {
+  decrease(productId: number, quantity: number = 1) {
+    const qty = this.sanitizeQty(quantity);
+
     const items = this._items();
     const existing = items.find((i) => i.product.id === productId);
     if (!existing) return;
 
-    const nextQty = existing.quantity - 1;
+    const nextQty = existing.quantity - qty;
 
     if (nextQty <= 0) {
       this.remove(productId);
@@ -81,6 +91,14 @@ export class CartService {
 
   clear() {
     this._items.set([]);
+  }
+
+  // ---------- helpers ----------
+  private sanitizeQty(value: unknown): number {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 1;
+    const i = Math.floor(n);
+    return Math.min(99, Math.max(1, i));
   }
 
   private loadFromStorage(): CartItem[] {

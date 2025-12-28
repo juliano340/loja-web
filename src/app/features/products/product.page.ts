@@ -37,6 +37,7 @@ import { CartService } from '../../core/services/cart.service';
               [src]="imageUrl(product)"
               [alt]="product.name"
               loading="lazy"
+              referrerpolicy="no-referrer"
               (error)="onImgError($event)"
             />
           </div>
@@ -147,35 +148,15 @@ export class ProductPage implements OnInit {
   }
 
   addToCart(product: Product) {
-    const anyCart = this.cart as any;
-
-    if (typeof anyCart.add === 'function') {
-      try {
-        anyCart.add(product, this.qty);
-      } catch {
-        anyCart.add(product);
-        for (let i = 1; i < this.qty; i++) anyCart.add(product);
-      }
-      return;
-    }
-
-    if (typeof anyCart.addItem === 'function') {
-      try {
-        anyCart.addItem(product, this.qty);
-      } catch {
-        anyCart.addItem(product);
-        for (let i = 1; i < this.qty; i++) anyCart.addItem(product);
-      }
-      return;
-    }
-
-    console.warn('CartService não possui add/addItem. Ajuste o método do carrinho.');
+    // ✅ agora funciona de verdade
+    this.cart.add(product, this.qty);
+    // opcional: resetar depois de adicionar
+    // this.qty = 1;
   }
 
   formatPrice(value: any): string {
     const n = typeof value === 'number' ? value : Number(String(value ?? '').replace(',', '.'));
     const safe = Number.isFinite(n) ? n : 0;
-
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(safe);
   }
 
