@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,11 +19,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <nav class="header-nav">
             <a routerLink="/products" class="header-link" (click)="closeAll()">Produtos</a>
 
-            <!-- ✅ Se logado: deixa "Meus pedidos" (opcional) e perfil no dropdown -->
-            @if (auth.isAuthenticated()) {
-            <a routerLink="/orders" class="header-link" (click)="closeAll()">Meus pedidos</a>
-
-            <!-- PERFIL (dropdown) -->
+            <!-- PERFIL (dropdown) - desktop -->
             <div class="relative">
               <button
                 type="button"
@@ -32,15 +28,29 @@ import { AuthService } from '../../../core/services/auth.service';
                 aria-label="Menu do perfil"
                 [attr.aria-expanded]="profileOpen"
               >
-                👤
+                <!-- user outline -->
+                <svg
+                  class="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                  <circle cx="12" cy="8" r="4" />
+                </svg>
               </button>
 
               @if (profileOpen) {
               <div
-                class="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
+                class="absolute right-0 mt-2 w-52 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
                 role="menu"
                 aria-label="Opções do perfil"
               >
+                @if (auth.isAuthenticated()) {
                 <a
                   routerLink="/profile"
                   class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
@@ -65,32 +75,11 @@ import { AuthService } from '../../../core/services/auth.service';
                   type="button"
                   class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
                   role="menuitem"
-                  (click)="logout()"
+                  (click)="openLogoutConfirm()"
                 >
                   Sair
                 </button>
-              </div>
-              }
-            </div>
-            } @else {
-            <!-- ✅ Se guest: perfil vira menu de autenticação -->
-            <div class="relative">
-              <button
-                type="button"
-                class="icon-btn"
-                (click)="toggleProfileMenu($event)"
-                aria-label="Entrar ou cadastrar"
-                [attr.aria-expanded]="profileOpen"
-              >
-                👤
-              </button>
-
-              @if (profileOpen) {
-              <div
-                class="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
-                role="menu"
-                aria-label="Conta"
-              >
+                } @else {
                 <a
                   routerLink="/login"
                   class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
@@ -108,20 +97,38 @@ import { AuthService } from '../../../core/services/auth.service';
                 >
                   Cadastrar
                 </a>
+                }
               </div>
               }
             </div>
-            }
           </nav>
 
-          <!-- CARRINHO -->
+          <!-- CARRINHO (SVG) -->
           <a
             routerLink="/cart"
             class="icon-btn relative"
             aria-label="Carrinho"
             (click)="closeAll()"
           >
-            🛒 @if (cart.totalItems() > 0) {
+            <!-- shopping cart outline -->
+            <svg
+              class="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="21" r="1.5" />
+              <circle cx="20" cy="21" r="1.5" />
+              <path
+                d="M1.5 2.5h2.2l2.1 12.1a2.2 2.2 0 0 0 2.2 1.8h9.7a2.2 2.2 0 0 0 2.2-1.7l1.2-7.3H6.1"
+              />
+            </svg>
+
+            @if (cart.totalItems() > 0) {
             <span class="cart-badge">
               {{ cart.totalItems() }}
             </span>
@@ -140,7 +147,9 @@ import { AuthService } from '../../../core/services/auth.service';
           @if (auth.isAuthenticated()) {
           <a routerLink="/orders" class="mobile-menu-item" (click)="closeAll()"> Meus pedidos </a>
           <a routerLink="/profile" class="mobile-menu-item" (click)="closeAll()"> Meu perfil </a>
-          <button type="button" class="mobile-menu-item text-left" (click)="logout()">Sair</button>
+          <button type="button" class="mobile-menu-item text-left" (click)="openLogoutConfirm()">
+            Sair
+          </button>
           } @else {
           <a routerLink="/login" class="mobile-menu-item" (click)="closeAll()"> Login </a>
           <a routerLink="/register" class="mobile-menu-item" (click)="closeAll()"> Cadastrar </a>
@@ -149,18 +158,82 @@ import { AuthService } from '../../../core/services/auth.service';
         }
       </div>
     </header>
+
+    <!-- ✅ MODAL CONFIRMAÇÃO SAIR -->
+    @if (confirmLogoutOpen) {
+    <div
+      class="fixed inset-0 z-[60] flex items-center justify-center px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Confirmação de saída"
+    >
+      <!-- overlay -->
+      <div class="absolute inset-0 bg-black/40" (click)="closeLogoutConfirm()"></div>
+
+      <!-- modal -->
+      <div
+        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold text-gray-900">Deseja realmente sair?</h2>
+            <p class="text-sm text-gray-600 mt-1">
+              Você precisará fazer login novamente para acessar checkout e pedidos.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="text-gray-500 hover:text-gray-700 transition"
+            (click)="closeLogoutConfirm()"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="mt-5 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            (click)="closeLogoutConfirm()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            (click)="confirmLogout()"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+    </div>
+    }
   `,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
   menuOpen = false;
   profileOpen = false;
 
+  confirmLogoutOpen = false;
+
+  // scroll lock state
+  private bodyLocked = false;
+  private prevBodyOverflow = '';
+  private prevBodyPaddingRight = '';
+
   constructor(public cart: CartService, public auth: AuthService, private router: Router) {}
+
+  ngOnDestroy(): void {
+    // garante que não deixa o body travado ao destruir o componente
+    this.unlockBodyScroll();
+  }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
-
-    // se abriu menu mobile, fecha dropdown do perfil
     if (this.menuOpen) this.profileOpen = false;
   }
 
@@ -172,26 +245,71 @@ export class HeaderComponent {
   toggleProfileMenu(ev: MouseEvent) {
     ev.stopPropagation();
     this.profileOpen = !this.profileOpen;
-
-    // se abriu dropdown do perfil, fecha menu mobile
     if (this.profileOpen) this.menuOpen = false;
   }
 
-  logout() {
+  openLogoutConfirm() {
     this.closeAll();
+    this.confirmLogoutOpen = true;
+    this.lockBodyScroll();
+  }
+
+  closeLogoutConfirm() {
+    this.confirmLogoutOpen = false;
+    this.unlockBodyScroll();
+  }
+
+  confirmLogout() {
+    this.confirmLogoutOpen = false;
+    this.unlockBodyScroll();
     this.auth.logout();
     this.router.navigate(['/']);
   }
 
-  // ✅ fecha ao clicar fora
+  // fecha dropdown ao clicar fora (mas não mexe no modal)
   @HostListener('document:click')
   onDocClick() {
     if (this.profileOpen) this.profileOpen = false;
   }
 
-  // ✅ fecha com ESC
+  // ESC fecha modal se aberto; senão fecha menus
   @HostListener('document:keydown.escape')
   onEsc() {
+    if (this.confirmLogoutOpen) {
+      this.closeLogoutConfirm();
+      return;
+    }
     this.closeAll();
+  }
+
+  // ---------- body scroll lock ----------
+  private lockBodyScroll(): void {
+    if (this.bodyLocked) return;
+
+    const body = document.body;
+    const docEl = document.documentElement;
+
+    // salva estado atual
+    this.prevBodyOverflow = body.style.overflow;
+    this.prevBodyPaddingRight = body.style.paddingRight;
+
+    // evita "pulo" quando some a scrollbar
+    const scrollbarWidth = window.innerWidth - docEl.clientWidth;
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    body.style.overflow = 'hidden';
+    this.bodyLocked = true;
+  }
+
+  private unlockBodyScroll(): void {
+    if (!this.bodyLocked) return;
+
+    const body = document.body;
+    body.style.overflow = this.prevBodyOverflow;
+    body.style.paddingRight = this.prevBodyPaddingRight;
+
+    this.bodyLocked = false;
   }
 }
