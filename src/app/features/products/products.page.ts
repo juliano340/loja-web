@@ -6,6 +6,7 @@ import { ProductsService, Product } from '../../core/services/products.service';
   selector: 'app-products-page',
   imports: [ProductCardComponent],
   template: `
+    <h1 class="text-primary text-xl font-medium">Tailwind funcionando</h1>
     <h1>Produtos</h1>
 
     @if (loading) {

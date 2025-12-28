@@ -1,16 +1,7 @@
-@import "tailwindcss";
-
-@layer base {
-    body {
-        @apply bg-gray-50 text-gray-900;
-    }
-}
-
 @layer components {
     .page {
-        @apply min-h-screen flex items-start justify-center pt-10 px-4 sm:px-6;
+        @apply min-h-screen flex items-start justify-center pt-10;
     }
-
 
     .card {
         @apply bg-white border border-gray-200 rounded-lg p-6 w-full max-w-md;

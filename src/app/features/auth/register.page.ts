@@ -2,44 +2,80 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   template: `
-    <h1>Criar conta</h1>
+    <div class="page">
+      <div class="card">
+        <h1 class="mb-4 text-lg font-semibold">Criar conta</h1>
 
-    <form (ngSubmit)="submit()" #form="ngForm">
-      <input type="text" placeholder="Nome" [(ngModel)]="name" name="name" required minlength="3" />
+        <form class="form" (ngSubmit)="submit()" #form="ngForm">
+          <input
+            class="input"
+            type="text"
+            placeholder="Nome"
+            [(ngModel)]="name"
+            name="name"
+            required
+            minlength="3"
+          />
 
-      <input type="email" placeholder="Email" [(ngModel)]="email" name="email" required email />
+          <input
+            class="input"
+            type="email"
+            placeholder="Email"
+            [(ngModel)]="email"
+            name="email"
+            required
+          />
 
-      <input
-        type="password"
-        placeholder="Senha"
-        [(ngModel)]="password"
-        name="password"
-        required
-        minlength="6"
-      />
+          <input
+            class="input"
+            type="password"
+            placeholder="Senha"
+            [(ngModel)]="password"
+            name="password"
+            required
+            minlength="6"
+          />
 
-      <input
-        type="password"
-        placeholder="Confirmar senha"
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-        required
-      />
+          <input
+            class="input"
+            type="password"
+            placeholder="Confirmar senha"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            required
+          />
 
-      @if (password && confirmPassword && password !== confirmPassword) {
-      <p style="color:red">As senhas não conferem</p>
-      }
+          @if (password && confirmPassword && password !== confirmPassword) {
+          <p class="text-sm text-red-600">As senhas não conferem</p>
+          } @if (error) {
+          <p class="text-sm text-red-600">
+            {{ error }}
+          </p>
+          }
 
-      <button type="submit" [disabled]="!form.valid || password !== confirmPassword">
-        Cadastrar
-      </button>
-    </form>
+          <button
+            class="btn-primary"
+            type="submit"
+            [disabled]="!form.valid || password !== confirmPassword"
+          >
+            Cadastrar
+          </button>
+        </form>
+
+        <!-- 🔗 LINK PARA LOGIN -->
+        <p class="mt-4 text-sm text-center text-gray-600">
+          Já tem conta?
+          <a routerLink="/login" class="text-blue-600 hover:underline font-medium"> Fazer login </a>
+        </p>
+      </div>
+    </div>
   `,
 })
 export class RegisterPage {
@@ -47,6 +83,7 @@ export class RegisterPage {
   email = '';
   password = '';
   confirmPassword = '';
+  error = '';
 
   constructor(private auth: AuthService, private router: Router) {}
 
