@@ -8,6 +8,8 @@ import { RegisterPage } from './features/auth/register.page';
 import { guestGuard } from './core/guards/guest.guard';
 import { ProfilePage } from './features/profile/profile.page';
 import { ChangePasswordPage } from './features/profile/change-password.page';
+import { checkoutSuccessOnceGuard } from './features/checkout/checkout-success.guard';
+import { nonEmptyCartGuard } from './core/guards/non-empty-cart.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
@@ -29,15 +31,14 @@ export const routes: Routes = [
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'profile/password', component: ChangePasswordPage, canActivate: [authGuard] },
 
-  // ✅ Checkout exige login (login só na finalização)
   {
     path: 'checkout',
-    canActivate: [authGuard],
+    canActivate: [authGuard, nonEmptyCartGuard],
     loadComponent: () => import('./features/checkout/checkout.page').then((m) => m.CheckoutPage),
   },
   {
     path: 'checkout/success',
-    canActivate: [authGuard],
+    canActivate: [authGuard, checkoutSuccessOnceGuard],
     loadComponent: () =>
       import('./features/checkout/checkout-success.page').then((m) => m.CheckoutSuccessPage),
   },

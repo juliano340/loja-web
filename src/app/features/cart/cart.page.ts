@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 
 type PriceLike = string | number | null | undefined;
@@ -10,6 +10,27 @@ type PriceLike = string | number | null | undefined;
   template: `
     <section class="min-h-[calc(100vh-56px)] flex items-start justify-center pt-10 px-4 sm:px-6">
       <div class="w-full max-w-5xl space-y-6">
+        <!-- Alert: tentou iniciar checkout com carrinho vazio -->
+        @if (showEmptyCheckoutNotice && cart.items().length === 0) {
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div class="text-sm text-amber-900">
+              <span class="font-semibold">Não dá pra iniciar o checkout</span> com o carrinho vazio.
+              Adicione pelo menos um item para continuar.
+            </div>
+
+            <button
+              type="button"
+              class="text-sm font-medium text-amber-900/80 hover:text-amber-900 transition"
+              (click)="dismissEmptyCheckoutNotice()"
+              aria-label="Fechar aviso"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+        }
+
         <!-- Topbar -->
         <header class="flex items-start justify-between gap-4">
           <div>
@@ -232,7 +253,23 @@ type PriceLike = string | number | null | undefined;
   `,
 })
 export class CartPage {
-  constructor(public cart: CartService, private router: Router) {}
+  showEmptyCheckoutNotice = false;
+
+  constructor(public cart: CartService, private router: Router, private route: ActivatedRoute) {
+    this.showEmptyCheckoutNotice = this.route.snapshot.queryParamMap.get('emptyCheckout') === '1';
+  }
+
+  dismissEmptyCheckoutNotice() {
+    this.showEmptyCheckoutNotice = false;
+
+    // remove o query param da URL sem recarregar
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { emptyCheckout: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   remove(productId: number) {
     this.cart.remove(productId);

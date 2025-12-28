@@ -16,8 +16,38 @@ export class CheckoutService {
 
   address = signal<Address | null>(null);
   paymentMethod = signal<'pix' | 'card' | 'cash' | null>(null);
-
   couponCode = signal<string>('');
+
+  // ✅ sucesso "uma vez só"
+  private readonly _successAllowed = signal(false);
+  private readonly _lastOrderId = signal<number | null>(null);
+
+  // read-only helpers
+  successAllowed() {
+    return this._successAllowed();
+  }
+
+  lastOrderId() {
+    return this._lastOrderId();
+  }
+
+  allowSuccessOnce(orderId: number) {
+    this._lastOrderId.set(orderId);
+    this._successAllowed.set(true);
+  }
+
+  consumeSuccessOrderId(): number | null {
+    if (!this._successAllowed() || !this._lastOrderId()) return null;
+
+    const id = this._lastOrderId();
+    this._successAllowed.set(false);
+    this._lastOrderId.set(null);
+    return id;
+  }
+
+  canShowSuccess(): boolean {
+    return this._successAllowed() && !!this._lastOrderId();
+  }
 
   nextStep() {
     const s = this.step();
@@ -36,6 +66,18 @@ export class CheckoutService {
   }
 
   reset() {
+    this.step.set(1);
+    this.address.set(null);
+    this.paymentMethod.set(null);
+    this.couponCode.set('');
+
+    // também limpa o "sucesso"
+    this._successAllowed.set(false);
+    this._lastOrderId.set(null);
+  }
+
+  // ✅ útil após criar o pedido: limpa checkout, mas deixa o success "vivo"
+  resetAfterOrderCreated() {
     this.step.set(1);
     this.address.set(null);
     this.paymentMethod.set(null);

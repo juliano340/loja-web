@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckoutService } from './checkout.service';
 import { CartService } from '../../core/services/cart.service';
-import { OrdersService, CreateOrderInput } from '../../core/services/orders.service';
+import { OrdersService, CreateOrderInput, Order } from '../../core/services/orders.service';
 
 @Component({
   standalone: true,
@@ -30,8 +30,6 @@ import { OrdersService, CreateOrderInput } from '../../core/services/orders.serv
       Checkout incompleto. Verifique endereço, pagamento e carrinho.
     </div>
     } @else {
-
-    <!-- Endereço -->
     <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
@@ -54,7 +52,6 @@ import { OrdersService, CreateOrderInput } from '../../core/services/orders.serv
       </div>
     </div>
 
-    <!-- Pagamento -->
     <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
@@ -79,7 +76,6 @@ import { OrdersService, CreateOrderInput } from '../../core/services/orders.serv
       </div>
     </div>
 
-    <!-- Itens -->
     <div class="mt-4 rounded-lg border border-gray-200 bg-white">
       <div class="p-4 border-b border-gray-200">
         <div class="text-sm font-semibold text-gray-900">Itens</div>
@@ -177,7 +173,7 @@ export class ReviewStepComponent {
       return;
     }
 
-    // validações alinhadas ao DTO
+    // validações alinhadas ao ShippingAddressDto
     const zip = String(address.zip ?? '').trim();
     const street = String(address.street ?? '').trim();
     const number = String(address.number ?? '').trim();
@@ -216,9 +212,14 @@ export class ReviewStepComponent {
     this.error = '';
 
     this.ordersService.create(payload).subscribe({
-      next: () => {
+      next: (order: Order) => {
+        // ✅ libera success UMA VEZ e guarda ID
+        this.checkout.allowSuccessOnce(order.id);
+
+        // limpa carrinho e “zera” checkout (mas mantém o successAllowed/orderId)
         this.cart.clear();
-        this.checkout.reset();
+        this.checkout.resetAfterOrderCreated();
+
         this.router.navigate(['/checkout/success']);
       },
       error: (err: any) => {

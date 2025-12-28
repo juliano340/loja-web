@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CheckoutService } from './checkout.service';
 
 @Component({
   standalone: true,
@@ -19,18 +20,18 @@ import { RouterLink } from '@angular/router';
 
             <div class="min-w-0">
               <h1 class="text-2xl font-semibold text-gray-900">Pedido confirmado</h1>
+
+              @if (orderId) {
+              <p class="text-sm text-gray-600 mt-2">
+                Número do pedido:
+                <span class="font-semibold text-gray-900">#{{ orderId }}</span>
+              </p>
+              }
+
               <p class="text-sm text-gray-600 mt-2 leading-relaxed">
-                Recebemos seu pedido e ele já apareceu em
-                <span class="font-medium">Meus pedidos</span>. Você pode acompanhar o status por lá.
+                Você já pode acompanhar o status em <span class="font-medium">Meus pedidos</span>.
               </p>
             </div>
-          </div>
-
-          <div class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <p class="text-sm text-gray-700">
-              Dica: se você precisar alterar algum dado, consulte o pedido e entre em contato com o
-              suporte.
-            </p>
           </div>
 
           <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -43,18 +44,23 @@ import { RouterLink } from '@angular/router';
               Continuar comprando
             </a>
           </div>
-
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <a
-              routerLink="/"
-              class="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
-            >
-              Voltar para a home
-            </a>
-          </div>
         </div>
       </div>
     </section>
   `,
 })
-export class CheckoutSuccessPage {}
+export class CheckoutSuccessPage implements OnInit {
+  orderId: number | null = null;
+
+  constructor(private checkout: CheckoutService, private router: Router) {}
+
+  ngOnInit(): void {
+    // ✅ consome: depois disso, nunca mais entra nessa página
+    this.orderId = this.checkout.consumeSuccessOrderId();
+
+    // segurança extra: se alguém cair aqui sem token, redireciona
+    if (!this.orderId) {
+      this.router.navigate(['/orders']);
+    }
+  }
+}
