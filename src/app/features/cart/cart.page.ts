@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, HostListener, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 
 type PriceLike = string | number | null | undefined;
+type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
 
 @Component({
   selector: 'app-cart-page',
   standalone: true,
+  imports: [RouterLink],
   template: `
     <section class="min-h-[calc(100vh-56px)] flex items-start justify-center pt-10 px-4 sm:px-6">
       <div class="w-full max-w-5xl space-y-6">
@@ -82,22 +84,23 @@ type PriceLike = string | number | null | undefined;
           </div>
         </div>
         } @else {
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Items -->
           <div class="bg-white border border-gray-200 rounded-lg p-6 lg:col-span-2">
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-900">Itens</h2>
-
               <span class="text-sm text-gray-500"> {{ cart.totalItems() }} unidade(s) </span>
             </div>
 
             <div class="mt-4 divide-y divide-gray-200">
               @for (item of cart.items(); track item.product.id) {
               <div class="py-4 flex gap-4">
-                <!-- Image -->
-                <div
-                  class="h-20 w-20 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0"
+                <!-- Image vira link -->
+                <a
+                  class="h-20 w-20 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 block cursor-pointer
+                             hover:border-gray-300 hover:bg-gray-100 transition"
+                  [routerLink]="['/products', item.product.id]"
+                  aria-label="Abrir produto"
                 >
                   @if (item.product.imageUrl) {
                   <img
@@ -114,14 +117,20 @@ type PriceLike = string | number | null | undefined;
                     Sem imagem
                   </div>
                   }
-                </div>
+                </a>
 
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-4">
-                    <div class="min-w-0">
-                      <p class="font-medium text-gray-900 truncate">
+                    <div class="min-w-0 flex-1">
+                      <a
+                        [routerLink]="['/products', item.product.id]"
+                        class="block w-full font-medium text-gray-900 truncate cursor-pointer
+                                   hover:underline decoration-gray-300 underline-offset-4 transition"
+                        [title]="item.product.name"
+                        aria-label="Abrir produto"
+                      >
                         {{ item.product.name }}
-                      </p>
+                      </a>
 
                       <p class="text-sm text-gray-500 mt-1">
                         Unitário:
@@ -129,10 +138,13 @@ type PriceLike = string | number | null | undefined;
                       </p>
                     </div>
 
+                    <!-- ✅ hit-area maior sem mudar visual -->
                     <button
                       type="button"
-                      class="text-sm font-medium text-red-600 hover:text-red-700 transition"
-                      (click)="remove(item.product.id)"
+                      class="shrink-0 -mr-2 -mt-1 px-2 py-1 rounded-md
+                                 text-sm font-medium text-red-600
+                                 hover:text-red-700 hover:bg-red-50 transition"
+                      (click)="openRemoveConfirm(item.product.id)"
                       aria-label="Remover item"
                     >
                       Remover
@@ -196,7 +208,7 @@ type PriceLike = string | number | null | undefined;
               <button
                 type="button"
                 class="px-4 py-2 rounded-md text-gray-600 hover:text-gray-900 transition"
-                (click)="clear()"
+                (click)="openClearConfirm()"
               >
                 Limpar carrinho
               </button>
@@ -250,19 +262,87 @@ type PriceLike = string | number | null | undefined;
         }
       </div>
     </section>
+
+    <!-- MODAL PREMIUM (reutilizado) -->
+    @if (confirmOpen) {
+    <div
+      class="fixed inset-0 z-[60] flex items-center justify-center px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Confirmação"
+    >
+      <div class="absolute inset-0 bg-black/40" (click)="closeConfirm()"></div>
+
+      <div
+        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 class="text-base font-semibold text-gray-900">{{ confirmTitle }}</h2>
+            <p class="text-sm text-gray-600 mt-1">
+              {{ confirmMessage }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="text-gray-500 hover:text-gray-700 transition"
+            (click)="closeConfirm()"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="mt-5 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            (click)="closeConfirm()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            (click)="confirm()"
+          >
+            {{ confirmCta }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
   `,
 })
-export class CartPage {
+export class CartPage implements OnDestroy {
   showEmptyCheckoutNotice = false;
+
+  confirmOpen = false;
+  confirmAction: ConfirmAction = 'REMOVE_ITEM';
+
+  confirmTitle = 'Confirmar ação';
+  confirmMessage = 'Tem certeza?';
+  confirmCta = 'Confirmar';
+
+  private removeProductId: number | null = null;
+
+  private bodyLocked = false;
+  private prevBodyOverflow = '';
+  private prevBodyPaddingRight = '';
 
   constructor(public cart: CartService, private router: Router, private route: ActivatedRoute) {
     this.showEmptyCheckoutNotice = this.route.snapshot.queryParamMap.get('emptyCheckout') === '1';
   }
 
+  ngOnDestroy(): void {
+    this.unlockBodyScroll();
+  }
+
   dismissEmptyCheckoutNotice() {
     this.showEmptyCheckoutNotice = false;
 
-    // remove o query param da URL sem recarregar
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { emptyCheckout: null },
@@ -271,12 +351,56 @@ export class CartPage {
     });
   }
 
-  remove(productId: number) {
-    this.cart.remove(productId);
+  openRemoveConfirm(productId: number) {
+    const item = this.cart.items().find((x) => x.product.id === productId);
+    const name = item?.product?.name ? `“${item.product.name}”` : 'este item';
+
+    this.confirmAction = 'REMOVE_ITEM';
+    this.removeProductId = productId;
+
+    this.confirmTitle = 'Remover item do carrinho?';
+    this.confirmMessage = `Você está prestes a remover ${name}.`;
+    this.confirmCta = 'Remover';
+
+    this.openConfirm();
   }
 
-  clear() {
+  openClearConfirm() {
+    this.confirmAction = 'CLEAR_CART';
+    this.removeProductId = null;
+
+    this.confirmTitle = 'Limpar carrinho?';
+    this.confirmMessage = 'Isso removerá todos os itens do carrinho.';
+    this.confirmCta = 'Limpar';
+
+    this.openConfirm();
+  }
+
+  private openConfirm() {
+    this.confirmOpen = true;
+    this.lockBodyScroll();
+  }
+
+  closeConfirm() {
+    this.confirmOpen = false;
+    this.removeProductId = null;
+    this.unlockBodyScroll();
+  }
+
+  confirm() {
+    if (this.confirmAction === 'REMOVE_ITEM') {
+      if (this.removeProductId != null) this.cart.remove(this.removeProductId);
+      this.closeConfirm();
+      return;
+    }
+
     this.cart.clear();
+    this.closeConfirm();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc() {
+    if (this.confirmOpen) this.closeConfirm();
   }
 
   increase(productId: number) {
@@ -284,6 +408,14 @@ export class CartPage {
   }
 
   decrease(productId: number) {
+    const item = this.cart.items().find((x) => x.product.id === productId);
+    const qty = item?.quantity ?? 0;
+
+    if (qty <= 1) {
+      this.openRemoveConfirm(productId);
+      return;
+    }
+
     this.cart.decrease(productId);
   }
 
@@ -299,7 +431,6 @@ export class CartPage {
     this.router.navigate(['/']);
   }
 
-  // ---------- money helpers ----------
   private toNumber(value: PriceLike): number {
     if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
     const raw = (value ?? '').toString().trim();
@@ -314,5 +445,33 @@ export class CartPage {
 
   lineTotal(quantity: number, unitPrice: PriceLike): number {
     return quantity * this.toNumber(unitPrice);
+  }
+
+  private lockBodyScroll(): void {
+    if (this.bodyLocked) return;
+
+    const body = document.body;
+    const docEl = document.documentElement;
+
+    this.prevBodyOverflow = body.style.overflow;
+    this.prevBodyPaddingRight = body.style.paddingRight;
+
+    const scrollbarWidth = window.innerWidth - docEl.clientWidth;
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    body.style.overflow = 'hidden';
+    this.bodyLocked = true;
+  }
+
+  private unlockBodyScroll(): void {
+    if (!this.bodyLocked) return;
+
+    const body = document.body;
+    body.style.overflow = this.prevBodyOverflow;
+    body.style.paddingRight = this.prevBodyPaddingRight;
+
+    this.bodyLocked = false;
   }
 }
