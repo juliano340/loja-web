@@ -11,27 +11,34 @@ import { ChangePasswordPage } from './features/profile/change-password.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
+
   { path: 'login', component: LoginPage, canActivate: [guestGuard] },
+  { path: 'register', component: RegisterPage, canActivate: [guestGuard] },
+
   { path: 'products', component: ProductsPage },
   {
-    path: 'cart',
-    component: CartPage,
+    path: 'products/:id',
+    loadComponent: () => import('./features/products/product.page').then((m) => m.ProductPage),
+  },
+
+  // ✅ Carrinho público (como loja real)
+  { path: 'cart', component: CartPage },
+
+  // ✅ Rotas que exigem login
+  { path: 'orders', component: OrdersPage, canActivate: [authGuard] },
+  { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
+  { path: 'profile/password', component: ChangePasswordPage, canActivate: [authGuard] },
+
+  // ✅ Checkout exige login (login só na finalização)
+  {
+    path: 'checkout',
     canActivate: [authGuard],
+    loadComponent: () => import('./features/checkout/checkout.page').then((m) => m.CheckoutPage),
   },
   {
-    path: 'orders',
-    component: OrdersPage,
+    path: 'checkout/success',
     canActivate: [authGuard],
-  },
-  { path: 'register', component: RegisterPage, canActivate: [guestGuard] },
-  {
-    path: 'profile',
-    component: ProfilePage,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'profile/password',
-    component: ChangePasswordPage,
-    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/checkout/checkout-success.page').then((m) => m.CheckoutSuccessPage),
   },
 ];

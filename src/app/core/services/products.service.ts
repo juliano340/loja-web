@@ -22,4 +22,8 @@ export class ProductsService {
   findAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);
   }
+
+  findOne(id: number) {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  }
 }
