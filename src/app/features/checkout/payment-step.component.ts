@@ -2,36 +2,40 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckoutService } from './checkout.service';
 import { CartService } from '../../core/services/cart.service';
-import { OrdersService } from '../../core/services/orders.service';
+import { OrdersService, CreateOrderInput } from '../../core/services/orders.service';
 
 @Component({
   standalone: true,
   selector: 'app-payment-step',
   template: `
-    <h2 class="text-lg font-medium mb-4">Pagamento</h2>
+    <h2 class="text-lg font-semibold text-gray-900 mb-2">Pagamento</h2>
+    <p class="text-sm text-gray-500 mb-4">Escolha a forma de pagamento.</p>
 
-    <!-- UI de pagamento (opcional pro backend, mas bom pro fluxo) -->
-    <div class="space-y-2 mb-6">
-      <button class="btn-primary" type="button" (click)="select('pix')">PIX</button>
-      <button class="btn-primary" type="button" (click)="select('card')">Cartão</button>
-      <button class="btn-primary" type="button" (click)="select('cash')">Na entrega</button>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+      <button class="btn-secondary" type="button" (click)="select('pix')">PIX</button>
+      <button class="btn-secondary" type="button" (click)="select('card')">Cartão</button>
+      <button class="btn-secondary" type="button" (click)="select('cash')">Na entrega</button>
     </div>
 
     <button
-      class="btn-primary mt-4"
+      class="btn-primary"
       type="button"
       [disabled]="loading || !canFinish()"
       (click)="finish()"
     >
       @if (loading) { Finalizando... } @else { Finalizar pedido }
     </button>
+
+    @if (error) {
+    <div class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      {{ error }}
+    </div>
+    }
   `,
 })
 export class PaymentStepComponent {
   loading = false;
-
-  // você pode manter isso só pra UX
-  selectedPayment: 'pix' | 'card' | 'cash' | null = null;
+  error = '';
 
   constructor(
     private checkout: CheckoutService,
@@ -41,12 +45,13 @@ export class PaymentStepComponent {
   ) {}
 
   select(method: 'pix' | 'card' | 'cash') {
-    this.selectedPayment = method;
+    this.checkout.paymentMethod.set(method);
+    this.error = '';
   }
 
   canFinish() {
     return (
-      this.cart.items().length > 0 && !!this.checkout.address() && !!this.selectedPayment // UX
+      this.cart.items().length > 0 && !!this.checkout.address() && !!this.checkout.paymentMethod()
     );
   }
 
@@ -59,10 +64,19 @@ export class PaymentStepComponent {
       return;
     }
 
-    // ✅ backend quer "zip" string (min 5)
-    const zip = String((address as any).zip ?? (address as any).cep ?? '').trim();
-    if (zip.length < 5) {
-      alert('CEP inválido. Informe um CEP com pelo menos 5 caracteres.');
+    // validação alinhada ao DTO (zip 5..10 e state 2)
+    const zip = String(address.zip ?? '').trim();
+    const state = String(address.state ?? '')
+      .trim()
+      .toUpperCase();
+
+    if (zip.length < 5 || zip.length > 10) {
+      this.error = 'CEP inválido (deve ter entre 5 e 10 caracteres).';
+      this.checkout.previousStep();
+      return;
+    }
+    if (state.length !== 2) {
+      this.error = 'UF inválida (deve ter 2 letras).';
       this.checkout.previousStep();
       return;
     }
@@ -72,33 +86,38 @@ export class PaymentStepComponent {
       quantity: item.quantity,
     }));
 
-    // ✅ payload conforme CreateOrderDto do backend
-    const payload = {
+    const shippingAddress: any = {
+      zip,
+      street: String(address.street ?? '').trim(),
+      number: String(address.number ?? '').trim(),
+      city: String(address.city ?? '').trim(),
+      state,
+    };
+
+    // ✅ agora pode enviar complement
+    const complement = (address.complement ?? '').trim();
+    if (complement) shippingAddress.complement = complement;
+
+    const payload: CreateOrderInput = {
       items,
-      shippingAddress: {
-        zip,
-        street: String((address as any).street ?? '').trim(),
-        number: String((address as any).number ?? '').trim(),
-        complement: (address as any).complement
-          ? String((address as any).complement).trim()
-          : undefined,
-        city: String((address as any).city ?? '').trim(),
-        state: String((address as any).state ?? '').trim(),
-      },
-      // couponCode: undefined, // se você implementar cupom depois
+      shippingAddress,
+      couponCode: null,
     };
 
     this.loading = true;
+    this.error = '';
 
     this.ordersService.create(payload).subscribe({
       next: () => {
         this.cart.clear();
+        this.checkout.reset();
         this.router.navigate(['/checkout/success']);
       },
-      error: (err: unknown) => {
+      error: (err: any) => {
         console.error('Erro ao criar pedido:', err);
         this.loading = false;
-        alert('Erro ao finalizar pedido');
+        const msg = err?.error?.message;
+        this.error = Array.isArray(msg) ? msg.join(', ') : msg || 'Erro ao finalizar pedido.';
       },
     });
   }

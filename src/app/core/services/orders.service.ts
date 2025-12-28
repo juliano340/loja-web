@@ -8,18 +8,18 @@ export interface CreateOrderItemInput {
 }
 
 export interface ShippingAddressInput {
-  zip: string;
-  city: string;
-  state: string;
-  number: string;
   street: string;
-  complement?: string;
+  number: string;
+  city: string;
+  state: string; // 2 letras
+  zip: string; // 5 a 10
+  complement?: string; // ✅ permitido
 }
 
 export interface CreateOrderInput {
   items: CreateOrderItemInput[];
   shippingAddress: ShippingAddressInput;
-  couponCode?: string;
+  couponCode?: string | null; // DTO é opcional
 }
 
 export interface OrderProduct {

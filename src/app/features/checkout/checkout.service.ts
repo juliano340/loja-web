@@ -1,13 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
 export interface Address {
-  name: string;
-  cep: string;
+  // UX (não vai pro backend)
+  name?: string;
+
+  // Backend (ShippingAddressDto)
+  zip: string;
   street: string;
   number: string;
-  complement?: string;
   city: string;
-  state: string;
+  state: string; // 2 letras
+  complement?: string; // ✅ agora pode enviar
 }
 
 @Injectable({ providedIn: 'root' })
