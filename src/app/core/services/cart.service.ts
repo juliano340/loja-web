@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { Product } from './products.service';
 
 export interface CartItem {
@@ -6,11 +6,13 @@ export interface CartItem {
   quantity: number;
 }
 
+const STORAGE_KEY = 'loja.cart.v1';
+
 @Injectable({
   providedIn: 'root',
 })
 export class CartService {
-  private readonly _items = signal<CartItem[]>([]);
+  private readonly _items = signal<CartItem[]>(this.loadFromStorage());
 
   readonly items = this._items.asReadonly();
 
@@ -23,6 +25,18 @@ export class CartService {
     }, 0)
   );
 
+  constructor() {
+    // ✅ Persistência automática
+    effect(() => {
+      const items = this._items();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      } catch {
+        // silencioso
+      }
+    });
+  }
+
   add(product: Product) {
     const items = this._items();
     const existing = items.find((i) => i.product.id === product.id);
@@ -30,9 +44,35 @@ export class CartService {
     if (existing) {
       existing.quantity++;
       this._items.set([...items]);
-    } else {
-      this._items.set([...items, { product, quantity: 1 }]);
+      return;
     }
+
+    this._items.set([...items, { product, quantity: 1 }]);
+  }
+
+  increase(productId: number) {
+    const items = this._items();
+    const existing = items.find((i) => i.product.id === productId);
+    if (!existing) return;
+
+    existing.quantity++;
+    this._items.set([...items]);
+  }
+
+  decrease(productId: number) {
+    const items = this._items();
+    const existing = items.find((i) => i.product.id === productId);
+    if (!existing) return;
+
+    const nextQty = existing.quantity - 1;
+
+    if (nextQty <= 0) {
+      this.remove(productId);
+      return;
+    }
+
+    existing.quantity = nextQty;
+    this._items.set([...items]);
   }
 
   remove(productId: number) {
@@ -41,5 +81,16 @@ export class CartService {
 
   clear() {
     this._items.set([]);
+  }
+
+  private loadFromStorage(): CartItem[] {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 }

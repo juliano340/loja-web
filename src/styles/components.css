@@ -1,12 +1,6 @@
-:root {
-    --header-h: 56px;
-}
-
 @layer components {
     .page {
-        min-height: calc(100vh - var(--header-h));
-        @apply flex items-start justify-center px-4 sm:px-6;
-        padding-top: 2rem;
+        @apply min-h-screen flex items-start justify-center pt-10;
     }
 
     .card {
