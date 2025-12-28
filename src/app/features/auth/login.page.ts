@@ -65,7 +65,6 @@ export class LoginPage {
 
     this.error = '';
     this.loading = true;
-    if (this.email || !this.password) return;
 
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
