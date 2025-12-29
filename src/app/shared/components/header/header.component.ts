@@ -7,8 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
   selector: 'app-header',
   standalone: true,
   imports: [RouterLink],
-  template: `
-    <header class="header">
+  template: `<header class="header">
       <div class="header-container">
         <!-- ESQUERDA -->
         <a routerLink="/" class="header-title" (click)="closeAll()"> Loja Web </a>
@@ -20,10 +19,18 @@ import { AuthService } from '../../../core/services/auth.service';
             <a routerLink="/products" class="header-link" (click)="closeAll()">Produtos</a>
 
             <!-- PERFIL (dropdown) - desktop -->
-            <div class="relative">
+            <div class="relative flex items-center gap-2">
+              @if (auth.isAuthenticated()) {
+              <span class="hidden md:inline text-sm text-gray-600 select-none">
+                Olá, <span class="font-medium text-gray-900">{{ displayName }}!</span>
+              </span>
+              }
+
               <button
                 type="button"
                 class="icon-btn"
+                [class.ring-1]="auth.isAuthenticated()"
+                [class.ring-blue-100]="auth.isAuthenticated()"
                 (click)="toggleProfileMenu($event)"
                 aria-label="Menu do perfil"
                 [attr.aria-expanded]="profileOpen"
@@ -46,7 +53,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
               @if (profileOpen) {
               <div
-                class="absolute right-0 mt-2 w-52 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
+                class="absolute right-0 top-full mt-2 w-52 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
                 role="menu"
                 aria-label="Opções do perfil"
               >
@@ -142,6 +149,12 @@ import { AuthService } from '../../../core/services/auth.service';
         <!-- MENU MOBILE -->
         @if (menuOpen) {
         <div class="mobile-menu md:hidden">
+          @if (auth.isAuthenticated()) {
+          <div class="px-4 py-3 border-b border-gray-200 text-sm text-gray-700">
+            Olá, <span class="font-medium text-gray-900">{{ displayName }}!</span>
+          </div>
+          }
+
           <a routerLink="/products" class="mobile-menu-item" (click)="closeAll()"> Produtos </a>
 
           @if (auth.isAuthenticated()) {
@@ -211,8 +224,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
       </div>
     </div>
-    }
-  `,
+    } `,
 })
 export class HeaderComponent implements OnDestroy {
   menuOpen = false;
@@ -311,5 +323,20 @@ export class HeaderComponent implements OnDestroy {
     body.style.paddingRight = this.prevBodyPaddingRight;
 
     this.bodyLocked = false;
+  }
+
+  get displayName(): string {
+    // Ajuste conforme o que o AuthService expõe.
+    // Fallbacks comuns:
+    const user: any =
+      (this.auth as any).user?.() ??
+      (this.auth as any).currentUser?.() ??
+      (this.auth as any).getUser?.() ??
+      (this.auth as any).user ??
+      null;
+
+    const name = user?.name ?? user?.fullName ?? user?.firstName ?? user?.email ?? '';
+
+    return String(name || 'usuário').split(' ')[0]; // pega só o primeiro nome
   }
 }

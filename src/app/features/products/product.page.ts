@@ -166,12 +166,12 @@ export class ProductPage implements OnInit {
       p?.image ||
       p?.thumbnail ||
       p?.photoUrl ||
-      'https://via.placeholder.com/800x600?text=Produto'
+      'https://placehold.co/800?text=Imagem&font=roboto'
     );
   }
 
   onImgError(ev: Event) {
     const img = ev.target as HTMLImageElement;
-    img.src = 'https://via.placeholder.com/800x600?text=Produto';
+    img.src = 'https://placehold.co/800?text=Imagem&font=roboto';
   }
 }

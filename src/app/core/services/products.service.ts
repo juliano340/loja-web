@@ -2,14 +2,23 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface Product {
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+};
+export type Product = {
   id: number;
   name: string;
-  description: string;
-  price: string;
+  description?: string;
+  price: string | number;
   stock: number;
-  imageUrl?: string;
-}
+  imageUrl?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  categories?: Category[];
+};
 
 @Injectable({
   providedIn: 'root',

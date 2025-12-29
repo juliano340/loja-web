@@ -90,11 +90,11 @@ export class ProductCardComponent {
       p?.image ||
       p?.thumbnail ||
       p?.photoUrl ||
-      'https://via.placeholder.com/600x450?text=Produto'
+      'https://placehold.co/800?text=Imagem&font=roboto'
     );
   }
 
   onImgError(ev: Event) {
-    (ev.target as HTMLImageElement).src = 'https://via.placeholder.com/600x450?text=Produto';
+    (ev.target as HTMLImageElement).src = 'https://placehold.co/800?text=Imagem&font=roboto';
   }
 }
