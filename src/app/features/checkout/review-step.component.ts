@@ -1,8 +1,16 @@
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckoutService } from './checkout.service';
 import { CartService } from '../../core/services/cart.service';
 import { OrdersService, CreateOrderInput, Order } from '../../core/services/orders.service';
+
+type CouponPreviewResponse = {
+  coupon: { code: string; type: string; value: string };
+  discountAmount: string;
+};
+
+type CheckoutSessionResponse = { url: string; sessionId: string };
 
 @Component({
   standalone: true,
@@ -18,6 +26,7 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
         type="button"
         class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
         (click)="checkout.previousStep()"
+        [disabled]="loading || couponLoading"
       >
         Voltar
       </button>
@@ -46,6 +55,7 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
           type="button"
           class="text-sm font-medium text-blue-600 hover:text-blue-700 transition"
           (click)="checkout.goTo(1)"
+          [disabled]="loading || couponLoading"
         >
           Editar
         </button>
@@ -59,9 +69,21 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
           <div class="text-sm text-gray-600 mt-1">
             {{ paymentLabel(paymentMethod) }}
           </div>
+
           @if (coupon) {
           <div class="text-sm text-gray-600 mt-1">
-            Cupom: <span class="font-medium text-gray-900">{{ coupon }}</span>
+            Cupom:
+            <span class="font-medium text-gray-900">{{ coupon }}</span>
+
+            @if (couponLoading) {
+            <span class="text-xs text-gray-500"> • validando...</span>
+            } @else if (couponPreviewError) {
+            <span class="text-xs text-red-700"> • {{ couponPreviewError }}</span>
+            } @else if (discount() > 0) {
+            <span class="text-xs text-gray-500"> • desconto {{ money(discount()) }}</span>
+            } @else {
+            <span class="text-xs text-gray-500"> • sem desconto</span>
+            }
           </div>
           }
         </div>
@@ -70,6 +92,7 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
           type="button"
           class="text-sm font-medium text-blue-600 hover:text-blue-700 transition"
           (click)="checkout.goTo(2)"
+          [disabled]="loading || couponLoading"
         >
           Editar
         </button>
@@ -100,15 +123,48 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
 
         <div class="h-px bg-gray-200 my-2"></div>
 
-        <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-600">Total</span>
-          <span class="font-semibold text-gray-900">{{ money(cart.totalPrice()) }}</span>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Subtotal</span>
+            <span class="font-medium text-gray-900">{{ money(subtotal()) }}</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Frete</span>
+            <span class="font-medium text-gray-900">{{ money(shippingFeeEstimate()) }}</span>
+          </div>
+
+          @if (coupon && !couponLoading && !couponPreviewError && discount() > 0) {
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Desconto</span>
+            <span class="font-medium text-green-700">- {{ money(discount()) }}</span>
+          </div>
+          }
+
+          <div class="flex items-center justify-between pt-2 border-t border-gray-200">
+            <span class="text-gray-900 font-semibold">Total</span>
+            <span class="text-gray-900 font-bold">
+              @if (coupon && couponLoading) { — } @else { {{ money(total()) }} }
+            </span>
+          </div>
+
+          @if (coupon && !couponLoading && couponPreviewError) {
+          <div class="text-xs text-gray-500 pt-1">
+            O pedido ainda pode ser finalizado, mas o cupom será ignorado se continuar inválido.
+          </div>
+          }
         </div>
       </div>
     </div>
 
-    <button class="btn-primary mt-6" type="button" [disabled]="loading" (click)="finish()">
-      @if (loading) { Finalizando... } @else { Confirmar pedido }
+    <button
+      class="btn-primary mt-6"
+      type="button"
+      [disabled]="loading || couponLoading"
+      (click)="finish()"
+    >
+      @if (loading) { Finalizando... } @else { @if (paymentMethod === 'card') { Pagar no cartão }
+      @else { Confirmar pedido } }
     </button>
 
     @if (error) {
@@ -119,15 +175,25 @@ import { OrdersService, CreateOrderInput, Order } from '../../core/services/orde
   `,
 })
 export class ReviewStepComponent {
+  private http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:3000';
+
   loading = false;
   error = '';
+
+  couponLoading = false;
+  couponPreviewError = '';
+  private discountAmountNumber = 0;
 
   constructor(
     public checkout: CheckoutService,
     public cart: CartService,
     private ordersService: OrdersService,
     private router: Router
-  ) {}
+  ) {
+    const c = this.coupon;
+    if (c) this.previewCoupon(c);
+  }
 
   get address() {
     return this.checkout.address();
@@ -148,6 +214,46 @@ export class ReviewStepComponent {
     return 'Na entrega';
   }
 
+  previewCoupon(code: string) {
+    const normalized = this.normalizeCoupon(code);
+    if (!normalized) return;
+
+    this.couponLoading = true;
+    this.couponPreviewError = '';
+    this.discountAmountNumber = 0;
+
+    const body = { couponCode: normalized, subtotal: this.subtotal().toFixed(2) };
+
+    this.http.post<CouponPreviewResponse>(`${this.baseUrl}/coupons/preview`, body).subscribe({
+      next: (res) => {
+        const serverCode = this.normalizeCoupon(res?.coupon?.code ?? normalized);
+        if (serverCode && serverCode !== this.checkout.couponCode()) {
+          this.checkout.couponCode.set(serverCode);
+        }
+
+        const discount = Number(String(res?.discountAmount ?? '0').replace(',', '.'));
+        this.discountAmountNumber = Number.isFinite(discount) ? discount : 0;
+
+        this.couponLoading = false;
+      },
+      error: (err: any) => {
+        const msg = err?.error?.message;
+        const text = Array.isArray(msg) ? msg.join(', ') : msg || 'Cupom inválido.';
+        this.couponPreviewError = text;
+
+        this.discountAmountNumber = 0;
+        this.couponLoading = false;
+      },
+    });
+  }
+
+  private normalizeCoupon(raw: string): string {
+    return String(raw ?? '')
+      .trim()
+      .replace(/\s+/g, '')
+      .toUpperCase();
+  }
+
   unitPrice(item: any): number {
     const n = Number(item?.product?.price);
     return Number.isFinite(n) ? n : 0;
@@ -157,9 +263,46 @@ export class ReviewStepComponent {
     return this.unitPrice(item) * (item?.quantity ?? 0);
   }
 
+  subtotal(): number {
+    const n = this.cart.totalPrice();
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  shippingFeeEstimate(): number {
+    const subtotal = this.subtotal();
+    if (subtotal >= 200) return 0;
+
+    const state = String(this.checkout.address()?.state ?? '')
+      .trim()
+      .toUpperCase();
+    if (!state) return 0;
+
+    return state === 'RS' ? 15 : 25;
+  }
+
+  discount(): number {
+    if (!this.coupon || this.couponPreviewError) return 0;
+
+    const s = this.subtotal();
+    const d = Number.isFinite(this.discountAmountNumber) ? this.discountAmountNumber : 0;
+    return Math.min(s, Math.max(0, d));
+  }
+
+  total(): number {
+    const t = this.subtotal() - this.discount() + this.shippingFeeEstimate();
+    return Math.max(0, t);
+  }
+
   money(value: number): string {
     const safe = Number.isFinite(value) ? value : 0;
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(safe);
+  }
+
+  private createCheckoutSession(orderId: number) {
+    // ✅ usa o backend para criar a sessão Stripe
+    return this.http.post<CheckoutSessionResponse>(`${this.baseUrl}/payments/checkout-session`, {
+      orderId,
+    });
   }
 
   finish() {
@@ -173,7 +316,6 @@ export class ReviewStepComponent {
       return;
     }
 
-    // validações alinhadas ao ShippingAddressDto
     const zip = String(address.zip ?? '').trim();
     const street = String(address.street ?? '').trim();
     const number = String(address.number ?? '').trim();
@@ -200,7 +342,8 @@ export class ReviewStepComponent {
     const shippingAddress: any = { zip, street, number, city, state };
     if (complement) shippingAddress.complement = complement;
 
-    const couponCode = this.coupon;
+    // ✅ se preview acusou inválido, NÃO manda cupom
+    const couponCode = this.coupon && !this.couponPreviewError ? this.coupon : '';
 
     const payload: CreateOrderInput = {
       items,
@@ -213,13 +356,32 @@ export class ReviewStepComponent {
 
     this.ordersService.create(payload).subscribe({
       next: (order: Order) => {
-        // ✅ libera success UMA VEZ e guarda ID
-        this.checkout.allowSuccessOnce(order.id);
+        // ✅ guarda o orderId pra tela de success consultar
+        localStorage.setItem('lastOrderId', String(order.id));
 
-        // limpa carrinho e “zera” checkout (mas mantém o successAllowed/orderId)
+        // ✅ Se for cartão: cria sessão e redireciona para Stripe
+        if (payment === 'card') {
+          this.createCheckoutSession(order.id).subscribe({
+            next: ({ url }) => {
+              // não limpa carrinho ainda — pagamento será confirmado via webhook
+              window.location.assign(url);
+            },
+            error: (err: any) => {
+              this.loading = false;
+              console.error('Erro ao criar checkout session:', err);
+              const msg = err?.error?.message;
+              this.error = Array.isArray(msg)
+                ? msg.join(', ')
+                : msg || 'Erro ao iniciar pagamento.';
+            },
+          });
+          return;
+        }
+
+        // ✅ PIX / Na entrega: finaliza no app (sem Stripe)
+        this.checkout.allowSuccessOnce(order.id);
         this.cart.clear();
         this.checkout.resetAfterOrderCreated();
-
         this.router.navigate(['/checkout/success']);
       },
       error: (err: any) => {
