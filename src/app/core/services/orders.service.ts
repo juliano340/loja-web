@@ -82,7 +82,8 @@ export class OrdersService {
   updateStatus(id: number, status: string): Observable<Order> {
     return this.http.patch<Order>(`${this.baseUrl}/orders/${id}/status`, { status });
   }
-  getById(orderId: string | number) {
-    return this.http.get<any>(`${this.baseUrl}/${orderId}`);
+  getById(id: number | string) {
+    const safeId = encodeURIComponent(String(id));
+    return this.http.get<Order>(`${this.baseUrl}/orders/${safeId}`);
   }
 }

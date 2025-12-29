@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { timer, of } from 'rxjs';
+import { of, timer } from 'rxjs';
 import { catchError, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 import { CheckoutService } from './checkout.service';
@@ -25,8 +25,8 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
               [class.border-green-200]="state === 'confirmed'"
               [class.bg-blue-50]="state === 'confirming'"
               [class.border-blue-200]="state === 'confirming'"
-              [class.bg-amber-50]="state === 'timeout'"
-              [class.border-amber-200]="state === 'timeout'"
+              [class.bg-amber-50]="state === 'timeout' || state === 'missing'"
+              [class.border-amber-200]="state === 'timeout' || state === 'missing'"
               aria-hidden="true"
             >
               @if (state === 'confirmed') {
@@ -73,9 +73,9 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
             </div>
           </div>
 
-          @if (state === 'confirmed' || state === 'timeout') {
+          @if (state === 'confirmed' || state === 'timeout' || state === 'missing') {
           <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <a routerLink="/orders" class="btn-primary text-center"> Ver meus pedidos </a>
+            <a routerLink="/orders" class="btn-primary text-center">Ver meus pedidos</a>
 
             <a
               routerLink="/products"
@@ -92,6 +92,7 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
 })
 export class CheckoutSuccessPage implements OnInit {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly orders = inject(OrdersService);
@@ -108,20 +109,25 @@ export class CheckoutSuccessPage implements OnInit {
   private readonly timeoutMs = 45_000;
 
   ngOnInit(): void {
-    const raw = localStorage.getItem('lastOrderId');
+    // ✅ 1) tenta pegar do query param (Stripe success_url) e cai pro localStorage
+    const rawParam = this.route.snapshot.queryParamMap.get('orderId');
+    const rawLs = localStorage.getItem('lastOrderId');
+    const raw = rawParam ?? rawLs;
 
     if (!raw) {
       this.state = 'missing';
-      this.router.navigate(['/orders']);
-      return;
+      return; // não redireciona: deixa CTAs
     }
 
     const id = Number(raw);
     if (!Number.isFinite(id) || id <= 0) {
       this.state = 'missing';
-      this.router.navigate(['/orders']);
+      localStorage.removeItem('lastOrderId');
       return;
     }
+
+    // ✅ garante consistência: se veio do Stripe via URL, salva no storage
+    localStorage.setItem('lastOrderId', String(id));
 
     this.orderId = id;
     this.state = 'confirming';
@@ -131,18 +137,18 @@ export class CheckoutSuccessPage implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         takeUntil(timer(this.timeoutMs)),
         switchMap(() =>
-          this.orders.getById(id).pipe(
-            // se falhar momentaneamente, continua tentando até o timeout
-            catchError(() => of(null))
-          )
+          // ⚠️ Se o teu OrdersService não se chama getById, troca aqui pelo método correto
+          this.orders.getById(id).pipe(catchError(() => of(null)))
         ),
         tap((order: any) => {
-          if (order?.status === 'PAID') {
+          const status = String(order?.status ?? '').toUpperCase();
+
+          if (status === 'PAID') {
             this.state = 'confirmed';
             this.finalizeSuccessPaid();
           }
         }),
-        filter((order: any) => order?.status === 'PAID'),
+        filter((order: any) => String(order?.status ?? '').toUpperCase() === 'PAID'),
         take(1)
       )
       .subscribe({
@@ -156,6 +162,7 @@ export class CheckoutSuccessPage implements OnInit {
     if (this.cleaned) return;
     this.cleaned = true;
 
+    // ✅ só limpa quando PAID
     this.cart.clear();
     this.checkout.clearAddress();
     localStorage.removeItem('lastOrderId');
