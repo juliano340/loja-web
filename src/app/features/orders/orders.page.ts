@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrdersService, Order, OrderItem } from '../../core/services/orders.service';
+import { CartService } from '../../core/services/cart.service';
+import { CheckoutService } from '../checkout/checkout.service';
 
 type PriceLike = string | number | null | undefined;
 type OrderStatusFilter = 'ALL' | 'PENDING' | 'PAID' | 'CANCELLED';
@@ -464,18 +466,60 @@ export class OrdersPage implements OnInit, OnDestroy {
     this.applyFilterSortAndPagination();
   };
 
-  constructor(private ordersService: OrdersService, private router: Router) {}
+  constructor(
+    private ordersService: OrdersService,
+    private router: Router,
+    private cart: CartService,
+    private checkout: CheckoutService
+  ) {}
 
   ngOnInit(): void {
-    // escuta mudança de breakpoint
     if (typeof this.desktopMedia?.addEventListener === 'function') {
       this.desktopMedia.addEventListener('change', this.onMediaChange);
     } else if (typeof this.desktopMedia?.addListener === 'function') {
-      // compat
       this.desktopMedia.addListener(this.onMediaChange);
     }
 
     this.reload();
+  }
+
+  private tryCleanupPaidOrderFromStorage(ordersList?: Order[]) {
+    const raw = localStorage.getItem('lastOrderId');
+    if (!raw) return;
+
+    const id = Number(raw);
+    if (!Number.isFinite(id) || id <= 0) {
+      localStorage.removeItem('lastOrderId');
+      return;
+    }
+
+    // ✅ 1) tenta pela lista que acabou de carregar (mais rápido e confiável)
+    const fromList = ordersList?.find((o) => o.id === id);
+    const listStatus = String(fromList?.status ?? '').toUpperCase();
+
+    if (listStatus === 'PAID') {
+      this.finishCheckoutCleanup();
+      return;
+    }
+
+    // ✅ 2) fallback: se não achou na lista, consulta direto
+    this.ordersService.getById(id).subscribe({
+      next: (order: any) => {
+        const status = String(order?.status ?? '').toUpperCase();
+        if (status === 'PAID') {
+          this.finishCheckoutCleanup();
+        }
+      },
+      error: () => {
+        // silencioso
+      },
+    });
+  }
+
+  private finishCheckoutCleanup() {
+    this.cart.clear();
+    this.checkout.clearAddress?.();
+    localStorage.removeItem('lastOrderId');
   }
 
   ngOnDestroy(): void {
@@ -510,6 +554,7 @@ export class OrdersPage implements OnInit, OnDestroy {
         this.currentPage = 1;
         this.expandedIds.clear();
         this.applyFilterSortAndPagination();
+        this.tryCleanupPaidOrderFromStorage(list);
 
         this.loading = false;
       },

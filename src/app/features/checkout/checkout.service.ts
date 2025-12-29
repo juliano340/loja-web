@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { effect } from '@angular/core';
 
 export interface Address {
   name?: string; // UX
@@ -12,6 +13,37 @@ export interface Address {
 
 @Injectable({ providedIn: 'root' })
 export class CheckoutService {
+  private readonly ADDRESS_STORAGE_KEY = 'checkout.address.v1';
+  constructor() {
+    // 1) carrega do storage (se existir)
+    try {
+      const raw = localStorage.getItem(this.ADDRESS_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Address;
+        this.address.set(parsed);
+      }
+    } catch {
+      // se o JSON estiver ruim, só limpa pra não quebrar o app
+      localStorage.removeItem(this.ADDRESS_STORAGE_KEY);
+    }
+
+    // 2) sempre que address mudar, persiste
+    effect(() => {
+      const addr = this.address();
+
+      if (addr) {
+        localStorage.setItem(this.ADDRESS_STORAGE_KEY, JSON.stringify(addr));
+      } else {
+        localStorage.removeItem(this.ADDRESS_STORAGE_KEY);
+      }
+    });
+  }
+
+  clearAddress() {
+    this.address.set(null);
+    localStorage.removeItem(this.ADDRESS_STORAGE_KEY);
+  }
+
   step = signal<1 | 2 | 3>(1);
 
   address = signal<Address | null>(null);

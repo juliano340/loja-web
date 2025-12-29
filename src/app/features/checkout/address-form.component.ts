@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CheckoutService, Address } from './checkout.service';
 import { HttpClient } from '@angular/common/http';
@@ -191,11 +191,69 @@ type ViaCepResponse = {
           Continuar para pagamento
         </button>
 
+        <button
+          type="button"
+          (click)="openClearConfirm()"
+          class="sm:w-auto px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+        >
+          Limpar endereço
+        </button>
+
         <span class="text-xs text-gray-500 sm:ml-auto">
           <span class="text-blue-600">*</span> obrigatórios
         </span>
       </div>
     </form>
+
+    <!-- MODAL PREMIUM (reutilizado) -->
+    @if (confirmOpen) {
+    <div
+      class="fixed inset-0 z-[60] flex items-center justify-center px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Confirmação"
+    >
+      <div class="absolute inset-0 bg-black/40" (click)="closeConfirm()"></div>
+
+      <div
+        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 class="text-base font-semibold text-gray-900">{{ confirmTitle }}</h2>
+            <p class="text-sm text-gray-600 mt-1">{{ confirmMessage }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="text-gray-500 hover:text-gray-700 transition"
+            (click)="closeConfirm()"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="mt-5 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            (click)="closeConfirm()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            (click)="confirmClearAddress()"
+          >
+            Limpar
+          </button>
+        </div>
+      </div>
+    </div>
+    }
   `,
 })
 export class AddressFormComponent implements OnDestroy {
@@ -223,6 +281,15 @@ export class AddressFormComponent implements OnDestroy {
   private zip$ = new Subject<string>();
   private sub: Subscription;
 
+  // ✅ modal premium
+  confirmOpen = false;
+  confirmTitle = 'Limpar endereço?';
+  confirmMessage = 'Isso removerá o endereço preenchido deste checkout.';
+
+  private bodyLocked = false;
+  private prevBodyOverflow = '';
+  private prevBodyPaddingRight = '';
+
   constructor(private checkout: CheckoutService, private http: HttpClient) {
     const existing = this.checkout.address();
     if (existing) this.model = { ...existing };
@@ -234,6 +301,7 @@ export class AddressFormComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.unlockBodyScroll();
   }
 
   markManual(field: 'street' | 'city' | 'state') {
@@ -314,5 +382,75 @@ export class AddressFormComponent implements OnDestroy {
 
     this.checkout.address.set(address);
     this.checkout.nextStep();
+  }
+
+  // ✅ modal actions
+  openClearConfirm() {
+    this.confirmOpen = true;
+    this.lockBodyScroll();
+  }
+
+  closeConfirm() {
+    this.confirmOpen = false;
+    this.unlockBodyScroll();
+  }
+
+  confirmClearAddress() {
+    this.clearAddress();
+    this.closeConfirm();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc() {
+    if (this.confirmOpen) this.closeConfirm();
+  }
+
+  clearAddress() {
+    // limpa estado persistido no checkout (e no localStorage, se você implementou no service)
+    this.checkout.clearAddress();
+
+    // reseta o form local
+    this.model = {
+      name: '',
+      zip: '',
+      street: '',
+      number: '',
+      city: '',
+      state: '',
+      complement: '',
+    };
+
+    this.manual = { street: false, city: false, state: false };
+    this.cepError = '';
+    this.cepLoading = false;
+    this.touched = false;
+  }
+
+  private lockBodyScroll(): void {
+    if (this.bodyLocked) return;
+
+    const body = document.body;
+    const docEl = document.documentElement;
+
+    this.prevBodyOverflow = body.style.overflow;
+    this.prevBodyPaddingRight = body.style.paddingRight;
+
+    const scrollbarWidth = window.innerWidth - docEl.clientWidth;
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    body.style.overflow = 'hidden';
+    this.bodyLocked = true;
+  }
+
+  private unlockBodyScroll(): void {
+    if (!this.bodyLocked) return;
+
+    const body = document.body;
+    body.style.overflow = this.prevBodyOverflow;
+    body.style.paddingRight = this.prevBodyPaddingRight;
+
+    this.bodyLocked = false;
   }
 }
