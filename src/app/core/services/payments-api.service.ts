@@ -6,7 +6,7 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
 
 @Injectable({ providedIn: 'root' })
 export class PaymentsApiService {
-  private baseUrl = 'http://localhost:3000'; // ✅ direto
+  private baseUrl = '/api'; // ✅ direto
 
   constructor(private http: HttpClient) {}
 

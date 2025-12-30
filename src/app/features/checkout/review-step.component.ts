@@ -176,7 +176,7 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
 })
 export class ReviewStepComponent {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = '/api';
 
   loading = false;
   error = '';

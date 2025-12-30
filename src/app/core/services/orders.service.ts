@@ -63,7 +63,7 @@ export interface Order {
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = '/api';
 
   constructor(private http: HttpClient) {}
 

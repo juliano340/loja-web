@@ -274,7 +274,7 @@ export class PaymentStepComponent {
       subtotal: subtotal.toFixed(2), // backend espera string
     };
 
-    this.http.post<CouponPreviewResponse>('http://localhost:3000/coupons/preview', body).subscribe({
+    this.http.post<CouponPreviewResponse>('/api/coupons/preview', body).subscribe({
       next: (res) => {
         const discount = Number(String(res?.discountAmount ?? '0').replace(',', '.'));
         this.discountAmountNumber = Number.isFinite(discount) ? discount : 0;

@@ -17,7 +17,7 @@ type CreateOrderResponse = { id: number };
 
 @Injectable({ providedIn: 'root' })
 export class OrdersApiService {
-  private baseUrl = 'http://localhost:3000';
+  private baseUrl = '/api';
 
   constructor(private http: HttpClient) {}
 

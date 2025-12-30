@@ -16,7 +16,7 @@ export interface User {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = '/api';
 
   private readonly _token = signal<string | null>(localStorage.getItem('token'));
 
@@ -36,7 +36,7 @@ export class AuthService {
   loadMe() {
     this._loadingUser.set(true);
 
-    return this.http.get<User>('http://localhost:3000/users/me').subscribe({
+    return this.http.get<User>('/api/users/me').subscribe({
       next: (user) => {
         this._user.set(user);
         this._loadingUser.set(false);
@@ -71,13 +71,13 @@ export class AuthService {
   }
 
   updateMe(data: { name: string; email: string }) {
-    return this.http.patch<User>('http://localhost:3000/users/me', data).subscribe({
+    return this.http.patch<User>('/api/users/me', data).subscribe({
       next: (user) => {
         this._user.set(user);
       },
     });
   }
   changePassword(data: { currentPassword: string; newPassword: string }) {
-    return this.http.patch('http://localhost:3000/users/me/password', data);
+    return this.http.patch('/api/users/me/password', data);
   }
 }
