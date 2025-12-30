@@ -24,7 +24,7 @@ export type Product = {
   providedIn: 'root',
 })
 export class ProductsService {
-  private readonly apiUrl = 'http://localhost:3000/products';
+  private readonly apiUrl = '/api/products';
 
   constructor(private http: HttpClient) {}
 
