@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api-loja.juliano340.com/"
+      "destination": "https://api-loja.juliano340.com/:path*"
     }
   ]
 }
