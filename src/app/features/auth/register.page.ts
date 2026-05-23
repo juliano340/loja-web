@@ -63,9 +63,9 @@ import { RouterLink } from '@angular/router';
           <button
             class="btn-primary"
             type="submit"
-            [disabled]="!form.valid || password !== confirmPassword"
+            [disabled]="!form.valid || password !== confirmPassword || loading"
           >
-            Cadastrar
+            @if (loading) { Criando conta... } @else { Cadastrar }
           </button>
         </form>
 
@@ -84,20 +84,28 @@ export class RegisterPage {
   password = '';
   confirmPassword = '';
   error = '';
+  loading = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   submit() {
-    if (this.password !== this.confirmPassword) return;
+    if (this.loading || this.password !== this.confirmPassword) return;
+
+    this.error = '';
+    this.loading = true;
 
     this.auth.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        alert('Cadastro realizado! Faça login.');
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], {
+          queryParams: { registered: '1', email: this.email },
+        });
       },
       error: (err) => {
-        console.error(err);
-        alert('Erro ao cadastrar');
+        this.loading = false;
+        const message = err?.error?.message;
+        this.error = Array.isArray(message)
+          ? message.join(', ')
+          : message || 'Não foi possível criar sua conta.';
       },
     });
   }

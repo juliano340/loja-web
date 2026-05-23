@@ -109,6 +109,14 @@ export class CheckoutSuccessPage implements OnInit {
   private readonly timeoutMs = 45_000;
 
   ngOnInit(): void {
+    const localSuccessOrderId = this.checkout.consumeSuccessOrderId();
+    if (localSuccessOrderId) {
+      this.orderId = localSuccessOrderId;
+      this.state = 'confirmed';
+      this.finalizeSuccessPaid();
+      return;
+    }
+
     // ✅ 1) tenta pegar do query param (Stripe success_url) e cai pro localStorage
     const rawParam = this.route.snapshot.queryParamMap.get('orderId');
     const rawLs = localStorage.getItem('lastOrderId');
