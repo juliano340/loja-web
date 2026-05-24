@@ -14,15 +14,7 @@ type Tab = 'products' | 'inventory' | 'orders';
   imports: [CommonModule, FormsModule],
   template: `
     <section class="page !items-stretch">
-      <div class="w-full max-w-6xl mx-auto px-4 py-6">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-6">
-          <div>
-            <p class="text-sm text-gray-500">Admin</p>
-            <h1 class="text-2xl font-semibold text-gray-950">Operação da loja</h1>
-          </div>
-          <button class="btn-primary sm:w-auto" type="button" (click)="refreshAll()">Atualizar</button>
-        </div>
-
+      <div class="w-full max-w-7xl mx-auto px-4 py-6">
         @if (message) {
         <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
           {{ message }}
@@ -33,242 +25,269 @@ type Tab = 'products' | 'inventory' | 'orders';
         </div>
         }
 
-        <div class="mb-5 flex flex-wrap gap-2">
-          <button class="tab-btn" [class.tab-active]="tab === 'products'" (click)="tab = 'products'">
-            Produtos
-          </button>
-          <button class="tab-btn" [class.tab-active]="tab === 'inventory'" (click)="tab = 'inventory'">
-            Estoque
-          </button>
-          <button class="tab-btn" [class.tab-active]="tab === 'orders'" (click)="tab = 'orders'">
-            Pedidos
-          </button>
-        </div>
+        <div class="flex gap-6">
+          <!-- SIDEBAR -->
+          <aside class="w-52 flex-shrink-0">
+            <nav class="sticky top-6 space-y-1">
+              <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin</p>
 
-        @if (loading) {
-        <div class="card">Carregando operação...</div>
-        } @else if (tab === 'products') {
-        <div class="card overflow-x-auto">
-          <div class="flex items-center justify-between gap-3 mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Produtos</h2>
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-gray-500">{{ products.length }} itens</span>
-              <button class="btn-primary sm:w-auto" type="button" (click)="openCreateProduct()">Novo produto</button>
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'products'" (click)="tab = 'products'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Produtos
+              </button>
+
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'inventory'" (click)="tab = 'inventory'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2a2 2 0 0 0 1 1.73"/><path d="M21 16v2a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 18v-2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Estoque
+              </button>
+
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'orders'" (click)="tab = 'orders'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Pedidos
+              </button>
+            </nav>
+          </aside>
+
+          <!-- MAIN CONTENT -->
+          <main class="flex-1 min-w-0">
+            @if (loading) {
+            <div class="card">Carregando...</div>
+            } @else if (tab === 'products') {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-gray-950">Produtos</h1>
+              <p class="text-sm text-gray-500 mt-1">Gerencie o catálogo de produtos da loja.</p>
             </div>
-          </div>
-          <table class="admin-table admin-table-fixed">
-            <thead>
-              <tr><th class="w-[38%]">Produto</th><th class="w-[12%]">Preço</th><th class="w-[25%]">Estoque</th><th class="w-[13%]">Status</th><th class="w-[12%]"></th></tr>
-            </thead>
-            <tbody>
-              @for (product of products; track product.id) {
-              <tr>
-                <td>
-                  <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
-                  <div class="text-xs text-gray-500">#{{ product.id }}</div>
-                </td>
-                <td>R$ {{ product.price }}</td>
-                <td>
-                  <div class="flex items-center gap-0.5">
-                    <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
-                    <span class="w-6 text-center tabular-nums text-xs">{{ product.stock }}</span>
-                    <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
-                    <button class="qty-btn qty-btn-sm" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge" [class.badge-off]="!product.isActive">
-                    {{ product.isActive ? 'Ativo' : 'Inativo' }}
-                  </span>
-                </td>
-                <td class="text-right whitespace-nowrap">
-                  <button class="link-btn" type="button" (click)="editProduct(product)">Editar</button>
-                </td>
-              </tr>
-              } @empty {
-              <tr><td colspan="5" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        @if (showProductModal) {
-        <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
-          <div class="absolute inset-0 bg-black/40" (click)="closeProductModal()"></div>
-          <div class="relative w-full max-w-lg rounded-xl bg-white border border-gray-200 shadow-xl p-6">
-            <div class="flex items-center justify-between mb-5">
-              <h2 class="text-lg font-semibold text-gray-900">
-                @if (editingProductId) { Editar produto } @else { Novo produto }
-              </h2>
-              <button type="button" class="text-gray-500 hover:text-gray-700 transition" (click)="closeProductModal()" aria-label="Fechar">✕</button>
-            </div>
-
-            <form class="form" (ngSubmit)="saveProduct()">
-              <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
-              <input class="input" name="price" type="number" min="0" step="0.01" placeholder="Preço" [(ngModel)]="productForm.price" required />
-              <input class="input" name="stock" type="number" min="0" step="1" placeholder="Estoque" [(ngModel)]="productForm.stock" required />
-              <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
-              <textarea class="input min-h-24" name="description" placeholder="Descrição" [(ngModel)]="productForm.description"></textarea>
-
-              <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
-                <option value="">Categoria</option>
-                @for (category of categories; track category.id) {
-                <option [value]="category.id">{{ category.name }}</option>
-                }
-              </select>
-
-              <label class="flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" name="isActive" [(ngModel)]="productForm.isActive" />
-                Produto ativo
-              </label>
-
-              <div class="flex items-center gap-3 pt-2">
-                <button class="btn-primary" type="submit">
-                  @if (saving) { Salvando... } @else if (editingProductId) { Salvar alterações } @else { Criar produto }
-                </button>
-                <button class="btn-secondary sm:w-auto" type="button" (click)="closeProductModal()">Cancelar</button>
+            <div class="card overflow-x-auto">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-gray-500">{{ products.length }} itens</span>
+                <button class="btn-primary sm:w-auto" type="button" (click)="openCreateProduct()">Novo produto</button>
               </div>
-            </form>
-          </div>
-        </div>
-        }
-        } @else if (tab === 'inventory') {
-        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
-          <div class="card !p-4 form">
-            <h2 class="text-lg font-semibold text-gray-900">Ajustar estoque</h2>
-            <select class="input" [(ngModel)]="inventoryProductId" name="inventoryProductId" (change)="loadMovements()">
-              <option [ngValue]="null">Selecione produto</option>
-              @for (product of products; track product.id) {
-              <option [ngValue]="product.id">{{ product.name }} ({{ product.stock }})</option>
-              }
-            </select>
-            <input class="input" type="number" step="1" name="stockDelta" placeholder="Delta: +10 ou -2" [(ngModel)]="stockDelta" />
-            <input class="input" name="stockNote" placeholder="Observação" [(ngModel)]="stockNote" />
-            <button class="btn-primary" type="button" [disabled]="!inventoryProductId || !stockDelta" (click)="adjustStock()">
-              Aplicar ajuste
-            </button>
-          </div>
+              <table class="admin-table admin-table-fixed">
+                <thead>
+                  <tr><th class="w-[38%]">Produto</th><th class="w-[12%]">Preço</th><th class="w-[25%]">Estoque</th><th class="w-[13%]">Status</th><th class="w-[12%]"></th></tr>
+                </thead>
+                <tbody>
+                  @for (product of products; track product.id) {
+                  <tr>
+                    <td>
+                      <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
+                      <div class="text-xs text-gray-500">#{{ product.id }}</div>
+                    </td>
+                    <td>R$ {{ product.price }}</td>
+                    <td>
+                      <div class="flex items-center gap-0.5">
+                        <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
+                        <span class="w-6 text-center tabular-nums text-xs">{{ product.stock }}</span>
+                        <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
+                        <button class="qty-btn qty-btn-sm" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge" [class.badge-off]="!product.isActive">
+                        {{ product.isActive ? 'Ativo' : 'Inativo' }}
+                      </span>
+                    </td>
+                    <td class="text-right whitespace-nowrap">
+                      <button class="link-btn" type="button" (click)="editProduct(product)">Editar</button>
+                    </td>
+                  </tr>
+                  } @empty {
+                  <tr><td colspan="5" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
 
-          <div class="card overflow-x-auto">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Movimentações</h2>
-            <table class="admin-table admin-table-fixed">
-              <thead>
-                <tr><th class="w-[22%]">Data</th><th class="w-[10%]">Tipo</th><th class="w-[12%]">Origem</th><th class="w-[8%]">Qtd</th><th class="w-[10%]">Antes</th><th class="w-[10%]">Depois</th><th class="w-[28%]">Nota</th></tr>
-              </thead>
-              <tbody>
-                @for (movement of movements; track movement.id) {
-                <tr>
-                  <td>{{ movement.createdAt | date:'short' }}</td>
-                  <td>{{ movement.type }}</td>
-                  <td>{{ movement.source }}</td>
-                  <td>{{ movement.quantity }}</td>
-                  <td>{{ movement.previousQuantity }}</td>
-                  <td>{{ movement.newQuantity }}</td>
-                  <td>{{ movement.note || '-' }}</td>
-                </tr>
-                } @empty {
-                <tr><td colspan="7" class="text-center text-gray-500 py-6">Selecione um produto.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-        } @else {
-        <div class="card overflow-x-auto">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Pedidos</h2>
-            <button class="btn-secondary sm:w-auto" type="button" (click)="cancelExpired()">Cancelar pendentes expirados</button>
-          </div>
+            @if (showProductModal) {
+            <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
+              <div class="absolute inset-0 bg-black/40" (click)="closeProductModal()"></div>
+              <div class="relative w-full max-w-lg rounded-xl bg-white border border-gray-200 shadow-xl p-6">
+                <div class="flex items-center justify-between mb-5">
+                  <h2 class="text-lg font-semibold text-gray-900">
+                    @if (editingProductId) { Editar produto } @else { Novo produto }
+                  </h2>
+                  <button type="button" class="text-gray-500 hover:text-gray-700 transition" (click)="closeProductModal()" aria-label="Fechar"></button>
+                </div>
 
-          <div class="flex flex-wrap gap-2 mb-3">
-            <button class="tab-btn" [class.tab-active]="orderFilter === 'ALL'" (click)="orderFilter = 'ALL'; orderPage = 1">Todos</button>
-            <button class="tab-btn" [class.tab-active]="orderFilter === 'PENDING'" (click)="orderFilter = 'PENDING'; orderPage = 1">Pendentes</button>
-            <button class="tab-btn" [class.tab-active]="orderFilter === 'PAID'" (click)="orderFilter = 'PAID'; orderPage = 1">Pagos</button>
-            <button class="tab-btn" [class.tab-active]="orderFilter === 'CANCELLED'" (click)="orderFilter = 'CANCELLED'; orderPage = 1">Cancelados</button>
-          </div>
+                <form class="form" (ngSubmit)="saveProduct()">
+                  <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
+                  <input class="input" name="price" type="number" min="0" step="0.01" placeholder="Preço" [(ngModel)]="productForm.price" required />
+                  <input class="input" name="stock" type="number" min="0" step="1" placeholder="Estoque" [(ngModel)]="productForm.stock" required />
+                  <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
+                  <textarea class="input min-h-24" name="description" placeholder="Descrição" [(ngModel)]="productForm.description"></textarea>
 
-          <table class="admin-table admin-table-fixed">
-            <thead>
-              <tr><th class="w-[10%]">Pedido</th><th class="w-[12%]">Status</th><th class="w-[12%]">Total</th><th class="w-[18%]">Cliente</th><th class="w-[20%]">Data</th><th class="w-[28%]">Ação</th></tr>
-            </thead>
-            <tbody>
-              @for (order of paginatedOrders; track order.id) {
-              <tr>
-                <td>
-                  <button class="link-btn font-mono" type="button" (click)="toggleOrderDetail(order)">
-                    #{{ order.id }}
-                  </button>
-                </td>
-                <td><span class="badge">{{ order.status }}</span></td>
-                <td>R$ {{ order.total }}</td>
-                <td>{{ order.user?.name ?? '#' + order.userId }}</td>
-                <td>{{ order.createdAt | date:'short' }}</td>
-                <td>
-                  <select class="input !py-1" [ngModel]="order.status" (ngModelChange)="updateOrder(order, $event)">
-                    <option value="PENDING">PENDING</option>
-                    <option value="PAID">PAID</option>
-                    <option value="CANCELLED">CANCELLED</option>
+                  <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
+                    <option value="">Categoria</option>
+                    @for (category of categories; track category.id) {
+                    <option [value]="category.id">{{ category.name }}</option>
+                    }
                   </select>
-                </td>
-              </tr>
-              @if (selectedOrderId === order.id) {
-              <tr>
-                <td colspan="6" class="!bg-gray-50 !px-6 !py-4">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 class="text-sm font-semibold text-gray-700 mb-2">Itens</h3>
-                      <table class="admin-table text-xs">
-                        <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Total</th></tr></thead>
-                        <tbody>
-                          @for (item of order.items; track item.id) {
-                          <tr>
-                            <td>{{ item.productName }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>R$ {{ item.unitPrice }}</td>
-                            <td>R$ {{ itemTotal(item) }}</td>
-                          </tr>
-                          }
-                        </tbody>
-                      </table>
-                    </div>
-                    <div class="space-y-1 text-sm">
-                      <h3 class="text-sm font-semibold text-gray-700 mb-2">Detalhes</h3>
-                      <p><span class="text-gray-500">Cliente:</span> {{ order.user?.name ?? '#' + order.userId }}</p>
-                      <p><span class="text-gray-500">Email:</span> {{ order.user?.email ?? '-' }}</p>
-                      <p><span class="text-gray-500">Criado:</span> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                      @if (order.paidAt) { <p><span class="text-gray-500">Pago:</span> {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</p> }
-                      @if (order.cancelledAt) { <p><span class="text-gray-500">Cancelado:</span> {{ order.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</p> }
-                      @if (order.couponCode) {
-                      <p><span class="text-gray-500">Cupom:</span> {{ order.couponCode }} ({{ order.discountType }} {{ order.discountValue }})</p>
-                      }
-                      @if (order.shippingAddress) {
-                      <p><span class="text-gray-500">Endereço:</span> {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }} - {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}</p>
-                      }
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              }
-              } @empty {
-              <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum pedido encontrado.</td></tr>
-              }
-            </tbody>
-          </table>
 
-          @if (totalOrderPages > 1) {
-          <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
-            <button class="link-btn" type="button" [disabled]="orderPage <= 1" (click)="orderPage = orderPage - 1">← Anterior</button>
-            <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
-            <button class="link-btn" type="button" [disabled]="orderPage >= totalOrderPages" (click)="orderPage = orderPage + 1">Próximo →</button>
-          </div>
-          }
+                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" name="isActive" [(ngModel)]="productForm.isActive" />
+                    Produto ativo
+                  </label>
+
+                  <div class="flex items-center gap-3 pt-2">
+                    <button class="btn-primary" type="submit">
+                      @if (saving) { Salvando... } @else if (editingProductId) { Salvar alterações } @else { Criar produto }
+                    </button>
+                    <button class="btn-secondary sm:w-auto" type="button" (click)="closeProductModal()">Cancelar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            }
+            } @else if (tab === 'inventory') {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-gray-950">Estoque</h1>
+              <p class="text-sm text-gray-500 mt-1">Ajuste quantidades e acompanhe movimentações.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+              <div class="card !p-4 form">
+                <h2 class="text-lg font-semibold text-gray-900">Ajustar estoque</h2>
+                <select class="input" [(ngModel)]="inventoryProductId" name="inventoryProductId" (change)="loadMovements()">
+                  <option [ngValue]="null">Selecione produto</option>
+                  @for (product of products; track product.id) {
+                  <option [ngValue]="product.id">{{ product.name }} ({{ product.stock }})</option>
+                  }
+                </select>
+                <input class="input" type="number" step="1" name="stockDelta" placeholder="Delta: +10 ou -2" [(ngModel)]="stockDelta" />
+                <input class="input" name="stockNote" placeholder="Observação" [(ngModel)]="stockNote" />
+                <button class="btn-primary" type="button" [disabled]="!inventoryProductId || !stockDelta" (click)="adjustStock()">
+                  Aplicar ajuste
+                </button>
+              </div>
+
+              <div class="card overflow-x-auto">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Movimentações</h2>
+                <table class="admin-table admin-table-fixed">
+                  <thead>
+                    <tr><th class="w-[22%]">Data</th><th class="w-[10%]">Tipo</th><th class="w-[12%]">Origem</th><th class="w-[8%]">Qtd</th><th class="w-[10%]">Antes</th><th class="w-[10%]">Depois</th><th class="w-[28%]">Nota</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (movement of movements; track movement.id) {
+                    <tr>
+                      <td>{{ movement.createdAt | date:'short' }}</td>
+                      <td>{{ movement.type }}</td>
+                      <td>{{ movement.source }}</td>
+                      <td>{{ movement.quantity }}</td>
+                      <td>{{ movement.previousQuantity }}</td>
+                      <td>{{ movement.newQuantity }}</td>
+                      <td>{{ movement.note || '-' }}</td>
+                    </tr>
+                    } @empty {
+                    <tr><td colspan="7" class="text-center text-gray-500 py-6">Selecione um produto.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            } @else {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-gray-950">Pedidos</h1>
+              <p class="text-sm text-gray-500 mt-1">Gerencie pedidos e acompanhe pagamentos.</p>
+            </div>
+            <div class="card overflow-x-auto">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <button class="btn-secondary sm:w-auto" type="button" (click)="cancelExpired()">Cancelar pendentes expirados</button>
+              </div>
+
+              <div class="flex flex-wrap gap-2 mb-3">
+                <button class="tab-btn" [class.tab-active]="orderFilter === 'ALL'" (click)="orderFilter = 'ALL'; orderPage = 1">Todos</button>
+                <button class="tab-btn" [class.tab-active]="orderFilter === 'PENDING'" (click)="orderFilter = 'PENDING'; orderPage = 1">Pendentes</button>
+                <button class="tab-btn" [class.tab-active]="orderFilter === 'PAID'" (click)="orderFilter = 'PAID'; orderPage = 1">Pagos</button>
+                <button class="tab-btn" [class.tab-active]="orderFilter === 'CANCELLED'" (click)="orderFilter = 'CANCELLED'; orderPage = 1">Cancelados</button>
+              </div>
+
+              <table class="admin-table admin-table-fixed">
+                <thead>
+                  <tr><th class="w-[10%]">Pedido</th><th class="w-[12%]">Status</th><th class="w-[12%]">Total</th><th class="w-[18%]">Cliente</th><th class="w-[20%]">Data</th><th class="w-[28%]">Ação</th></tr>
+                </thead>
+                <tbody>
+                  @for (order of paginatedOrders; track order.id) {
+                  <tr>
+                    <td>
+                      <button class="link-btn font-mono" type="button" (click)="toggleOrderDetail(order)">
+                        #{{ order.id }}
+                      </button>
+                    </td>
+                    <td><span class="badge">{{ order.status }}</span></td>
+                    <td>R$ {{ order.total }}</td>
+                    <td>{{ order.user?.name ?? '#' + order.userId }}</td>
+                    <td>{{ order.createdAt | date:'short' }}</td>
+                    <td>
+                      <select class="input !py-1" [ngModel]="order.status" (ngModelChange)="updateOrder(order, $event)">
+                        <option value="PENDING">PENDING</option>
+                        <option value="PAID">PAID</option>
+                        <option value="CANCELLED">CANCELLED</option>
+                      </select>
+                    </td>
+                  </tr>
+                  @if (selectedOrderId === order.id) {
+                  <tr>
+                    <td colspan="6" class="!bg-gray-50 !px-6 !py-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h3 class="text-sm font-semibold text-gray-700 mb-2">Itens</h3>
+                          <table class="admin-table text-xs">
+                            <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Total</th></tr></thead>
+                            <tbody>
+                              @for (item of order.items; track item.id) {
+                              <tr>
+                                <td>{{ item.productName }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>R$ {{ item.unitPrice }}</td>
+                                <td>R$ {{ itemTotal(item) }}</td>
+                              </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="space-y-1 text-sm">
+                          <h3 class="text-sm font-semibold text-gray-700 mb-2">Detalhes</h3>
+                          <p><span class="text-gray-500">Cliente:</span> {{ order.user?.name ?? '#' + order.userId }}</p>
+                          <p><span class="text-gray-500">Email:</span> {{ order.user?.email ?? '-' }}</p>
+                          <p><span class="text-gray-500">Criado:</span> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                          @if (order.paidAt) { <p><span class="text-gray-500">Pago:</span> {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                          @if (order.cancelledAt) { <p><span class="text-gray-500">Cancelado:</span> {{ order.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                          @if (order.couponCode) {
+                          <p><span class="text-gray-500">Cupom:</span> {{ order.couponCode }} ({{ order.discountType }} {{ order.discountValue }})</p>
+                          }
+                          @if (order.shippingAddress) {
+                          <p><span class="text-gray-500">Endereço:</span> {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }} - {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}</p>
+                          }
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                  } @empty {
+                  <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum pedido encontrado.</td></tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (totalOrderPages > 1) {
+              <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
+                <button class="link-btn" type="button" [disabled]="orderPage <= 1" (click)="orderPage = orderPage - 1">← Anterior</button>
+                <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
+                <button class="link-btn" type="button" [disabled]="orderPage >= totalOrderPages" (click)="orderPage = orderPage + 1">Próximo →</button>
+              </div>
+              }
+            </div>
+            }
+          </main>
         </div>
-        }
       </div>
     </section>
   `,
   styles: [
     `
+      .sidebar-link { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #4b5563; background: transparent; border: none; cursor: pointer; text-align: left; transition: all .15s; }
+      .sidebar-link:hover { background: #f3f4f6; color: #111827; }
+      .sidebar-active { background: #111827; color: white; }
+      .sidebar-active:hover { background: #111827; color: white; }
       .tab-btn { border: 1px solid #d1d5db; border-radius: 999px; padding: 0.5rem 1rem; background: white; color: #374151; }
       .tab-active { background: #111827; color: white; border-color: #111827; }
       .btn-secondary { width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; background: white; padding: 0.5rem 1rem; color: #111827; transition: background .15s; }
