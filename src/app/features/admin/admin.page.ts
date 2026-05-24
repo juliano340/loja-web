@@ -163,32 +163,33 @@ type Tab = 'products' | 'inventory' | 'orders';
 
                 <label class="text-xs font-medium text-gray-500">Produto</label>
                 <div class="relative">
-                  <input class="input" name="inventorySearch" placeholder="Filtrar por nome ou SKU..." [(ngModel)]="inventorySearch" />
-                  @if (inventorySearch) {
-                  <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" (click)="inventorySearch = ''">✕</button>
+                  <input
+                    #comboboxInput
+                    class="input w-full"
+                    name="inventorySearch"
+                    [placeholder]="inventoryProductId ? '' : 'Buscar por nome ou SKU...'"
+                    [value]="comboboxDisplayValue"
+                    (input)="inventorySearch = comboboxInput.value; onInventorySearchChange()"
+                    (focus)="openCombobox()"
+                    (blur)="onComboboxBlur()"
+                  />
+                  @if (inventoryProductId) {
+                  <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500" (click)="clearInventorySelection()">✕</button>
+                  }
+                  @if (inventoryComboboxOpen && filteredInventoryProducts.length > 0) {
+                  <div class="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg">
+                    @for (product of filteredInventoryProducts; track product.id) {
+                    <button type="button" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0 transition" [class.bg-blue-50]="inventoryProductId === product.id" [class.font-medium]="inventoryProductId === product.id" (mousedown)="selectInventoryProduct(product)">
+                      <span>{{ product.name }}</span>
+                      @if (product.sku) { <span class="text-xs text-gray-400 ml-1">({{ product.sku }})</span> }
+                      <span class="text-xs text-gray-500 float-right">{{ product.stock }} un.</span>
+                    </button>
+                    }
+                  </div>
+                  } @else if (inventoryComboboxOpen && inventorySearch) {
+                  <div class="absolute z-10 mt-1 w-full border border-gray-200 rounded-md bg-white shadow-lg px-3 py-4 text-sm text-gray-400 text-center">Nenhum produto encontrado.</div>
                   }
                 </div>
-
-                <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white">
-                  @for (product of filteredInventoryProducts; track product.id) {
-                  <button type="button" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0 transition" [class.bg-blue-50]="inventoryProductId === product.id" [class.font-medium]="inventoryProductId === product.id" (click)="selectInventoryProduct(product)">
-                    <span>{{ product.name }}</span>
-                    @if (product.sku) { <span class="text-xs text-gray-400 ml-1">({{ product.sku }})</span> }
-                    <span class="text-xs text-gray-500 float-right">{{ product.stock }} un.</span>
-                  </button>
-                  } @empty {
-                  <div class="px-3 py-4 text-sm text-gray-400 text-center">Nenhum produto encontrado.</div>
-                  }
-                </div>
-
-                @if (inventoryProductId) {
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <span>Selecionado:</span>
-                  <span class="font-medium text-gray-900">{{ selectedProduct?.name }}</span>
-                  @if (selectedProduct?.sku) { <span class="text-gray-400">({{ selectedProduct?.sku }})</span> }
-                  <button type="button" class="text-gray-400 hover:text-red-500 ml-auto" (click)="clearInventorySelection()">✕ Limpar</button>
-                </div>
-                }
 
                 <label class="text-xs font-medium text-gray-500">Tipo</label>
                 <div class="flex gap-2">
@@ -394,6 +395,7 @@ export class AdminPage implements OnInit {
 
   inventoryProductId: number | null = null;
   inventorySearch = '';
+  inventoryComboboxOpen = false;
   stockQuantity = 0;
   stockNote = '';
   stockType: 'entry' | 'exit' | 'adjust' = 'entry';
@@ -583,21 +585,45 @@ export class AdminPage implements OnInit {
     return { name: '', sku: '', description: '', price: 0, stock: 0, imageUrl: '', isActive: true, categoryIds: [] };
   }
 
+  get comboboxDisplayValue(): string {
+    if (this.inventoryProductId) {
+      const p = this.selectedProduct;
+      return p ? `${p.name}${p.sku ? ` (${p.sku})` : ''}` : '';
+    }
+    return this.inventorySearch;
+  }
+
   onInventorySearchChange() {
     if (!this.inventorySearch) {
       this.inventoryProductId = null;
     }
+    this.inventoryComboboxOpen = true;
+  }
+
+  openCombobox() {
+    this.inventoryComboboxOpen = true;
+  }
+
+  closeCombobox() {
+    this.inventoryComboboxOpen = false;
   }
 
   selectInventoryProduct(product: Product) {
     this.inventoryProductId = product.id;
     this.inventorySearch = '';
+    this.inventoryComboboxOpen = false;
     this.loadMovements();
   }
 
   clearInventorySelection() {
     this.inventoryProductId = null;
+    this.inventorySearch = '';
+    this.inventoryComboboxOpen = false;
     this.movements = [];
+  }
+
+  onComboboxBlur() {
+    setTimeout(() => this.closeCombobox(), 150);
   }
 
   private setError(err: any) {
