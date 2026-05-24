@@ -28,6 +28,10 @@ export class AuthService {
 
   readonly user = this._user.asReadonly();
 
+  readonly isAdmin = computed(() => !!this._user()?.isAdmin);
+
+  readonly isUserLoaded = computed(() => !!this._user() || !this._token());
+
   private readonly _loadingUser = signal(false);
   readonly loadingUser = this._loadingUser.asReadonly();
 
