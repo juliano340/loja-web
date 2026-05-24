@@ -48,8 +48,8 @@ type Tab = 'products' | 'inventory' | 'orders';
         @if (loading) {
         <div class="card">Carregando operação...</div>
         } @else if (tab === 'products') {
-        <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5">
-          <form class="card form" (ngSubmit)="saveProduct()">
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+          <form class="card !p-4 form" (ngSubmit)="saveProduct()">
             <h2 class="text-lg font-semibold text-gray-900">
               @if (editingProductId) { Editar produto } @else { Novo produto }
             </h2>
@@ -145,8 +145,8 @@ type Tab = 'products' | 'inventory' | 'orders';
           </div>
         </div>
         } @else if (tab === 'inventory') {
-        <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5">
-          <div class="card form">
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+          <div class="card !p-4 form">
             <h2 class="text-lg font-semibold text-gray-900">Ajustar estoque</h2>
             <select class="input" [(ngModel)]="inventoryProductId" name="inventoryProductId" (change)="loadMovements()">
               <option [ngValue]="null">Selecione produto</option>
