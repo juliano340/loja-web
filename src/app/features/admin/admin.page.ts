@@ -121,11 +121,11 @@ type Tab = 'products' | 'inventory' | 'orders';
                   </td>
                   <td>R$ {{ product.price }}</td>
                   <td>
-                    <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-0.5">
                       <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
-                      <span class="w-8 text-center tabular-nums">{{ product.stock }}</span>
+                      <span class="w-6 text-center tabular-nums text-xs">{{ product.stock }}</span>
                       <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
-                      <button class="qty-btn text-xs" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
+                      <button class="qty-btn qty-btn-sm" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
                     </div>
                   </td>
                   <td>
@@ -133,7 +133,7 @@ type Tab = 'products' | 'inventory' | 'orders';
                       {{ product.isActive ? 'Ativo' : 'Inativo' }}
                     </span>
                   </td>
-                  <td class="text-right">
+                  <td class="text-right whitespace-nowrap">
                     <button class="link-btn" type="button" (click)="editProduct(product)">Editar</button>
                   </td>
                 </tr>
@@ -286,14 +286,15 @@ type Tab = 'products' | 'inventory' | 'orders';
       .btn-secondary { width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; background: white; padding: 0.5rem 1rem; color: #111827; transition: background .15s; }
       .btn-secondary:hover { background: #f9fafb; }
       .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-      .admin-table th { text-align: left; color: #6b7280; font-weight: 500; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
-      .admin-table td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+      .admin-table th { text-align: left; color: #6b7280; font-weight: 500; padding: 0.5rem 0.6rem; border-bottom: 1px solid #e5e7eb; }
+      .admin-table td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
       .badge { display: inline-flex; border-radius: 999px; padding: 0.125rem 0.625rem; background: #ecfdf5; color: #047857; font-size: 0.75rem; font-weight: 600; }
       .badge-off { background: #f3f4f6; color: #6b7280; }
       .link-btn { color: #2563eb; font-weight: 500; background: none; border: none; cursor: pointer; padding: 0; font-size: inherit; }
       .link-btn:hover { text-decoration: underline; }
       .link-btn[disabled] { color: #9ca3af; pointer-events: none; }
-      .qty-btn { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; line-height: 1; }
+      .qty-btn { width: 20px; height: 20px; border-radius: 3px; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 0.688rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; line-height: 1; }
+      .qty-btn-sm { font-size: 0.625rem; width: 22px; }
       .qty-btn:hover { background: #e5e7eb; }
     `,
   ],
