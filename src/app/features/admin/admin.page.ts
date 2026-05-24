@@ -120,7 +120,14 @@ type Tab = 'products' | 'inventory' | 'orders';
                     <div class="text-xs text-gray-500">#{{ product.id }}</div>
                   </td>
                   <td>R$ {{ product.price }}</td>
-                  <td>{{ product.stock }}</td>
+                  <td>
+                    <div class="flex items-center gap-1">
+                      <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
+                      <span class="w-8 text-center tabular-nums">{{ product.stock }}</span>
+                      <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
+                      <button class="qty-btn text-xs" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
+                    </div>
+                  </td>
                   <td>
                     <span class="badge" [class.badge-off]="!product.isActive">
                       {{ product.isActive ? 'Ativo' : 'Inativo' }}
@@ -184,17 +191,29 @@ type Tab = 'products' | 'inventory' | 'orders';
             <h2 class="text-lg font-semibold text-gray-900">Pedidos</h2>
             <button class="btn-secondary sm:w-auto" type="button" (click)="cancelExpired()">Cancelar pendentes expirados</button>
           </div>
+
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button class="tab-btn" [class.tab-active]="orderFilter === 'ALL'" (click)="orderFilter = 'ALL'; orderPage = 1">Todos</button>
+            <button class="tab-btn" [class.tab-active]="orderFilter === 'PENDING'" (click)="orderFilter = 'PENDING'; orderPage = 1">Pendentes</button>
+            <button class="tab-btn" [class.tab-active]="orderFilter === 'PAID'" (click)="orderFilter = 'PAID'; orderPage = 1">Pagos</button>
+            <button class="tab-btn" [class.tab-active]="orderFilter === 'CANCELLED'" (click)="orderFilter = 'CANCELLED'; orderPage = 1">Cancelados</button>
+          </div>
+
           <table class="admin-table">
             <thead>
               <tr><th>Pedido</th><th>Status</th><th>Total</th><th>Cliente</th><th>Data</th><th>Ação</th></tr>
             </thead>
             <tbody>
-              @for (order of orders; track order.id) {
+              @for (order of paginatedOrders; track order.id) {
               <tr>
-                <td>#{{ order.id }}</td>
+                <td>
+                  <button class="link-btn font-mono" type="button" (click)="toggleOrderDetail(order)">
+                    #{{ order.id }}
+                  </button>
+                </td>
                 <td><span class="badge">{{ order.status }}</span></td>
                 <td>R$ {{ order.total }}</td>
-                <td>#{{ order.userId }}</td>
+                <td>{{ order.user?.name ?? '#' + order.userId }}</td>
                 <td>{{ order.createdAt | date:'short' }}</td>
                 <td>
                   <select class="input !py-1" [ngModel]="order.status" (ngModelChange)="updateOrder(order, $event)">
@@ -204,11 +223,57 @@ type Tab = 'products' | 'inventory' | 'orders';
                   </select>
                 </td>
               </tr>
+              @if (selectedOrderId === order.id) {
+              <tr>
+                <td colspan="6" class="!bg-gray-50 !px-6 !py-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 class="text-sm font-semibold text-gray-700 mb-2">Itens</h3>
+                      <table class="admin-table text-xs">
+                        <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Total</th></tr></thead>
+                        <tbody>
+                          @for (item of order.items; track item.id) {
+                          <tr>
+                            <td>{{ item.productName }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>R$ {{ item.unitPrice }}</td>
+                            <td>R$ {{ itemTotal(item) }}</td>
+                          </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="space-y-1 text-sm">
+                      <h3 class="text-sm font-semibold text-gray-700 mb-2">Detalhes</h3>
+                      <p><span class="text-gray-500">Cliente:</span> {{ order.user?.name ?? '#' + order.userId }}</p>
+                      <p><span class="text-gray-500">Email:</span> {{ order.user?.email ?? '-' }}</p>
+                      <p><span class="text-gray-500">Criado:</span> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                      @if (order.paidAt) { <p><span class="text-gray-500">Pago:</span> {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                      @if (order.cancelledAt) { <p><span class="text-gray-500">Cancelado:</span> {{ order.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                      @if (order.couponCode) {
+                      <p><span class="text-gray-500">Cupom:</span> {{ order.couponCode }} ({{ order.discountType }} {{ order.discountValue }})</p>
+                      }
+                      @if (order.shippingAddress) {
+                      <p><span class="text-gray-500">Endereço:</span> {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }} - {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}</p>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              }
               } @empty {
               <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum pedido encontrado.</td></tr>
               }
             </tbody>
           </table>
+
+          @if (totalOrderPages > 1) {
+          <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
+            <button class="link-btn" type="button" [disabled]="orderPage <= 1" (click)="orderPage = orderPage - 1">← Anterior</button>
+            <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
+            <button class="link-btn" type="button" [disabled]="orderPage >= totalOrderPages" (click)="orderPage = orderPage + 1">Próximo →</button>
+          </div>
+          }
         </div>
         }
       </div>
@@ -225,8 +290,11 @@ type Tab = 'products' | 'inventory' | 'orders';
       .admin-table td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
       .badge { display: inline-flex; border-radius: 999px; padding: 0.125rem 0.625rem; background: #ecfdf5; color: #047857; font-size: 0.75rem; font-weight: 600; }
       .badge-off { background: #f3f4f6; color: #6b7280; }
-      .link-btn { color: #2563eb; font-weight: 500; }
+      .link-btn { color: #2563eb; font-weight: 500; background: none; border: none; cursor: pointer; padding: 0; font-size: inherit; }
       .link-btn:hover { text-decoration: underline; }
+      .link-btn[disabled] { color: #9ca3af; pointer-events: none; }
+      .qty-btn { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; line-height: 1; }
+      .qty-btn:hover { background: #e5e7eb; }
     `,
   ],
 })
@@ -250,10 +318,29 @@ export class AdminPage implements OnInit {
   stockDelta = 0;
   stockNote = '';
 
+  selectedOrderId: number | null = null;
+  orderFilter = 'ALL';
+  orderPage = 1;
+  ordersPerPage = 10;
+
   constructor(private api: AdminApiService) {}
 
   ngOnInit() {
     this.refreshAll();
+  }
+
+  get filteredOrders() {
+    if (this.orderFilter === 'ALL') return this.orders;
+    return this.orders.filter(o => o.status === this.orderFilter);
+  }
+
+  get paginatedOrders() {
+    const start = (this.orderPage - 1) * this.ordersPerPage;
+    return this.filteredOrders.slice(start, start + this.ordersPerPage);
+  }
+
+  get totalOrderPages() {
+    return Math.ceil(this.filteredOrders.length / this.ordersPerPage) || 1;
   }
 
   refreshAll() {
@@ -350,6 +437,25 @@ export class AdminPage implements OnInit {
       next: (count) => {
         this.message = `${count} pedidos expirados cancelados.`;
         this.api.listOrders().subscribe((orders) => (this.orders = orders));
+      },
+      error: (e) => this.setError(e),
+    });
+  }
+
+  itemTotal(item: { quantity: number; unitPrice: string }) {
+    return (item.quantity * Number(item.unitPrice)).toFixed(2);
+  }
+
+  toggleOrderDetail(order: Order) {
+    this.selectedOrderId = this.selectedOrderId === order.id ? null : order.id;
+  }
+
+  quickAdjustStock(productId: number, delta: number) {
+    this.api.adjustStock(productId, delta, 'Ajuste rápido').subscribe({
+      next: () => {
+        this.message = `Estoque #${productId} ajustado em ${delta > 0 ? '+' : ''}${delta}.`;
+        this.api.listProducts().subscribe(products => this.products = products);
+        if (this.inventoryProductId === productId) this.loadMovements();
       },
       error: (e) => this.setError(e),
     });

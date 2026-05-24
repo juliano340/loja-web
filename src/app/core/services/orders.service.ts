@@ -59,6 +59,7 @@ export interface Order {
   discountValue: string | null;
   discountAmount: string | null;
   userId: number;
+  user?: { id: number; name: string; email: string };
 }
 
 @Injectable({ providedIn: 'root' })
