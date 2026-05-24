@@ -57,14 +57,14 @@ type Tab = 'products' | 'inventory' | 'orders';
               <h1 class="text-2xl font-semibold text-gray-950">Produtos</h1>
               <p class="text-sm text-gray-500 mt-1">Gerencie o catálogo de produtos da loja.</p>
             </div>
-            <div class="card overflow-x-auto">
+            <div class="card !max-w-none overflow-x-auto">
               <div class="flex items-center justify-between gap-3 mb-4">
                 <span class="text-sm text-gray-500">{{ products.length }} itens</span>
                 <button class="btn-primary sm:w-auto" type="button" (click)="openCreateProduct()">Novo produto</button>
               </div>
-              <table class="admin-table admin-table-fixed">
+              <table class="admin-table">
                 <thead>
-                  <tr><th class="w-[38%]">Produto</th><th class="w-[12%]">Preço</th><th class="w-[25%]">Estoque</th><th class="w-[13%]">Status</th><th class="w-[12%]"></th></tr>
+                  <tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr>
                 </thead>
                 <tbody>
                   @for (product of products; track product.id) {
@@ -159,11 +159,11 @@ type Tab = 'products' | 'inventory' | 'orders';
                 </button>
               </div>
 
-              <div class="card overflow-x-auto">
+              <div class="card !max-w-none overflow-x-auto">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Movimentações</h2>
-                <table class="admin-table admin-table-fixed">
+                <table class="admin-table">
                   <thead>
-                    <tr><th class="w-[22%]">Data</th><th class="w-[10%]">Tipo</th><th class="w-[12%]">Origem</th><th class="w-[8%]">Qtd</th><th class="w-[10%]">Antes</th><th class="w-[10%]">Depois</th><th class="w-[28%]">Nota</th></tr>
+                    <tr><th>Data</th><th>Tipo</th><th>Origem</th><th>Qtd</th><th>Antes</th><th>Depois</th><th>Nota</th></tr>
                   </thead>
                   <tbody>
                     @for (movement of movements; track movement.id) {
@@ -188,9 +188,9 @@ type Tab = 'products' | 'inventory' | 'orders';
               <h1 class="text-2xl font-semibold text-gray-950">Pedidos</h1>
               <p class="text-sm text-gray-500 mt-1">Gerencie pedidos e acompanhe pagamentos.</p>
             </div>
-            <div class="card overflow-x-auto">
+            <div class="card !max-w-none overflow-x-auto">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <button class="btn-secondary sm:w-auto" type="button" (click)="cancelExpired()">Cancelar pendentes expirados</button>
+                <button class="btn-secondary sm:w-auto" style="width:auto" type="button" (click)="cancelExpired()">Cancelar pendentes expirados</button>
               </div>
 
               <div class="flex flex-wrap gap-2 mb-3">
@@ -200,9 +200,9 @@ type Tab = 'products' | 'inventory' | 'orders';
                 <button class="tab-btn" [class.tab-active]="orderFilter === 'CANCELLED'" (click)="orderFilter = 'CANCELLED'; orderPage = 1">Cancelados</button>
               </div>
 
-              <table class="admin-table admin-table-fixed">
+              <table class="admin-table">
                 <thead>
-                  <tr><th class="w-[10%]">Pedido</th><th class="w-[12%]">Status</th><th class="w-[12%]">Total</th><th class="w-[18%]">Cliente</th><th class="w-[20%]">Data</th><th class="w-[28%]">Ação</th></tr>
+                  <tr><th>Pedido</th><th>Status</th><th>Total</th><th>Cliente</th><th>Data</th><th>Ação</th></tr>
                 </thead>
                 <tbody>
                   @for (order of paginatedOrders; track order.id) {
@@ -293,9 +293,8 @@ type Tab = 'products' | 'inventory' | 'orders';
       .btn-secondary { width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; background: white; padding: 0.5rem 1rem; color: #111827; transition: background .15s; }
       .btn-secondary:hover { background: #f9fafb; }
       .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-      .admin-table-fixed { table-layout: fixed; }
-      .admin-table th { text-align: left; color: #6b7280; font-weight: 500; padding: 0.5rem 0.6rem; border-bottom: 1px solid #e5e7eb; }
-      .admin-table td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+      .admin-table th { text-align: left; color: #6b7280; font-weight: 500; padding: 0.6rem 0.75rem; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+      .admin-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
       .badge { display: inline-flex; border-radius: 999px; padding: 0.125rem 0.625rem; background: #ecfdf5; color: #047857; font-size: 0.75rem; font-weight: 600; }
       .badge-off { background: #f3f4f6; color: #6b7280; }
       .link-btn { color: #2563eb; font-weight: 500; background: none; border: none; cursor: pointer; padding: 0; font-size: inherit; }
