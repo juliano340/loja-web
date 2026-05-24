@@ -141,21 +141,53 @@ type Tab = 'products' | 'inventory' | 'orders';
             } @else if (tab === 'inventory') {
             <div class="mb-6">
               <h1 class="text-2xl font-semibold text-gray-950">Estoque</h1>
-              <p class="text-sm text-gray-500 mt-1">Ajuste quantidades e acompanhe movimentações.</p>
+              <p class="text-sm text-gray-500 mt-1">Registre entradas, saídas e ajustes de saldo.</p>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+            <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
               <div class="card !p-4 form">
-                <h2 class="text-lg font-semibold text-gray-900">Ajustar estoque</h2>
+                <h2 class="text-lg font-semibold text-gray-900">Lançamento</h2>
+
+                <label class="text-xs font-medium text-gray-500">Produto</label>
                 <select class="input" [(ngModel)]="inventoryProductId" name="inventoryProductId" (change)="loadMovements()">
-                  <option [ngValue]="null">Selecione produto</option>
+                  <option [ngValue]="null">Selecione</option>
                   @for (product of products; track product.id) {
                   <option [ngValue]="product.id">{{ product.name }} ({{ product.stock }})</option>
                   }
                 </select>
-                <input class="input" type="number" step="1" name="stockDelta" placeholder="Delta: +10 ou -2" [(ngModel)]="stockDelta" />
-                <input class="input" name="stockNote" placeholder="Observação" [(ngModel)]="stockNote" />
-                <button class="btn-primary" type="button" [disabled]="!inventoryProductId || !stockDelta" (click)="adjustStock()">
-                  Aplicar ajuste
+
+                <label class="text-xs font-medium text-gray-500">Tipo</label>
+                <div class="flex gap-2">
+                  <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'entry'" (click)="stockType = 'entry'">Entrada</button>
+                  <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'exit'" (click)="stockType = 'exit'">Saída</button>
+                  <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'adjust'" (click)="stockType = 'adjust'">Ajuste</button>
+                </div>
+
+                <label class="text-xs font-medium text-gray-500">Origem</label>
+                <select class="input" [(ngModel)]="stockOrigin" name="stockOrigin">
+                  @if (stockType === 'entry') {
+                  <option value="purchase">Compra</option>
+                  <option value="return">Devolução</option>
+                  <option value="inventory">Inventário</option>
+                  <option value="other">Outro</option>
+                  } @else if (stockType === 'exit') {
+                  <option value="sale">Venda</option>
+                  <option value="loss">Perda</option>
+                  <option value="return">Devolução</option>
+                  <option value="other">Outro</option>
+                  } @else {
+                  <option value="inventory">Inventário</option>
+                  <option value="other">Outro</option>
+                  }
+                </select>
+
+                <label class="text-xs font-medium text-gray-500">Quantidade</label>
+                <input class="input" type="number" min="1" step="1" name="stockQuantity" placeholder="0" [(ngModel)]="stockQuantity" />
+
+                <label class="text-xs font-medium text-gray-500">Observação</label>
+                <input class="input" name="stockNote" placeholder="Opcional" [(ngModel)]="stockNote" />
+
+                <button class="btn-primary" type="button" [disabled]="!inventoryProductId || !stockQuantity" (click)="adjustStock()">
+                  Registrar
                 </button>
               </div>
 
@@ -290,6 +322,9 @@ type Tab = 'products' | 'inventory' | 'orders';
       .sidebar-active:hover { background: #111827; color: white; }
       .tab-btn { border: 1px solid #d1d5db; border-radius: 999px; padding: 0.5rem 1rem; background: white; color: #374151; }
       .tab-active { background: #111827; color: white; border-color: #111827; }
+      .stock-type-btn { flex: 1; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background: white; color: #374151; font-size: 0.8125rem; font-weight: 500; cursor: pointer; transition: all .15s; }
+      .stock-type-btn:hover { background: #f3f4f6; }
+      .stock-type-active { background: #111827; color: white; border-color: #111827; }
       .btn-secondary { width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; background: white; padding: 0.5rem 1rem; color: #111827; transition: background .15s; }
       .btn-secondary:hover { background: #f9fafb; }
       .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
@@ -323,8 +358,10 @@ export class AdminPage implements OnInit {
   productForm: ProductPayload = this.emptyProductForm();
 
   inventoryProductId: number | null = null;
-  stockDelta = 0;
+  stockQuantity = 0;
   stockNote = '';
+  stockType: 'entry' | 'exit' | 'adjust' = 'entry';
+  stockOrigin = 'purchase';
 
   selectedOrderId: number | null = null;
   orderFilter = 'ALL';
@@ -419,11 +456,23 @@ export class AdminPage implements OnInit {
   }
 
   adjustStock() {
-    if (!this.inventoryProductId || !this.stockDelta) return;
-    this.api.adjustStock(this.inventoryProductId, Number(this.stockDelta), this.stockNote).subscribe({
+    if (!this.inventoryProductId || !this.stockQuantity) return;
+    const delta = this.stockType === 'exit' ? -this.stockQuantity : this.stockQuantity;
+    const originMap: Record<string, string> = {
+      purchase: 'Compra',
+      return: 'Devolução',
+      loss: 'Perda',
+      inventory: 'Inventário',
+      sale: 'Venda',
+      other: 'Outro',
+    };
+    const note = this.stockNote
+      ? `[${originMap[this.stockOrigin] || this.stockOrigin}] ${this.stockNote}`
+      : originMap[this.stockOrigin] || this.stockOrigin;
+    this.api.adjustStock(this.inventoryProductId, delta, note).subscribe({
       next: () => {
         this.message = 'Estoque ajustado.';
-        this.stockDelta = 0;
+        this.stockQuantity = 0;
         this.stockNote = '';
         this.loadMovements();
         this.api.listProducts().subscribe((products) => (this.products = products));
