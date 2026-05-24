@@ -64,7 +64,7 @@ type Tab = 'products' | 'inventory' | 'orders';
               </div>
               <table class="admin-table">
                 <thead>
-                  <tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr>
+                  <tr><th>Produto</th><th>SKU</th><th>Preço</th><th>Estoque</th><th>Status</th><th></th></tr>
                 </thead>
                 <tbody>
                   @for (product of products; track product.id) {
@@ -73,6 +73,7 @@ type Tab = 'products' | 'inventory' | 'orders';
                       <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
                       <div class="text-xs text-gray-500">#{{ product.id }}</div>
                     </td>
+                    <td class="text-xs font-mono text-gray-500">{{ product.sku || '—' }}</td>
                     <td>R$ {{ product.price }}</td>
                     <td>
                       <div class="flex items-center gap-0.5">
@@ -92,7 +93,7 @@ type Tab = 'products' | 'inventory' | 'orders';
                     </td>
                   </tr>
                   } @empty {
-                  <tr><td colspan="5" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
+                  <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
                   }
                 </tbody>
               </table>
@@ -111,6 +112,7 @@ type Tab = 'products' | 'inventory' | 'orders';
 
                 <form class="form" (ngSubmit)="saveProduct()">
                   <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
+                  <input class="input" name="sku" placeholder="SKU (opcional)" [(ngModel)]="productForm.sku" />
                   <input class="input" name="price" type="number" min="0" step="0.01" placeholder="Preço" [(ngModel)]="productForm.price" required />
                   <input class="input" name="stock" type="number" min="0" step="1" placeholder="Estoque" [(ngModel)]="productForm.stock" required />
                   <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
@@ -147,13 +149,30 @@ type Tab = 'products' | 'inventory' | 'orders';
               <div class="card !p-4 form">
                 <h2 class="text-lg font-semibold text-gray-900">Lançamento</h2>
 
-                <label class="text-xs font-medium text-gray-500">Produto</label>
-                <select class="input" [(ngModel)]="inventoryProductId" name="inventoryProductId" (change)="loadMovements()">
-                  <option [ngValue]="null">Selecione</option>
-                  @for (product of products; track product.id) {
-                  <option [ngValue]="product.id">{{ product.name }} ({{ product.stock }})</option>
+                <label class="text-xs font-medium text-gray-500">Buscar produto (nome ou SKU)</label>
+                <input class="input" name="inventorySearch" placeholder="Digite para filtrar..." [(ngModel)]="inventorySearch" (ngModelChange)="onInventorySearchChange()" />
+
+                @if (inventorySearch) {
+                <div class="max-h-40 overflow-y-auto border border-gray-200 rounded-md">
+                  @for (product of filteredInventoryProducts; track product.id) {
+                  <button type="button" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0" [class.bg-blue-50]="inventoryProductId === product.id" (click)="selectInventoryProduct(product)">
+                    <span class="font-medium">{{ product.name }}</span>
+                    @if (product.sku) { <span class="text-xs text-gray-400 ml-1">({{ product.sku }})</span> }
+                    <span class="text-xs text-gray-500 float-right">{{ product.stock }} un.</span>
+                  </button>
+                  } @empty {
+                  <div class="px-3 py-2 text-sm text-gray-400">Nenhum produto encontrado.</div>
                   }
-                </select>
+                </div>
+                } @else if (inventoryProductId) {
+                <div class="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-md text-sm">
+                  <div>
+                    <span class="font-medium">{{ selectedProduct?.name }}</span>
+                    @if (selectedProduct?.sku) { <span class="text-xs text-gray-400 ml-1">({{ selectedProduct?.sku }})</span> }
+                  </div>
+                  <button type="button" class="text-gray-400 hover:text-gray-600" (click)="clearInventorySelection()">✕</button>
+                </div>
+                }
 
                 <label class="text-xs font-medium text-gray-500">Tipo</label>
                 <div class="flex gap-2">
@@ -358,6 +377,7 @@ export class AdminPage implements OnInit {
   productForm: ProductPayload = this.emptyProductForm();
 
   inventoryProductId: number | null = null;
+  inventorySearch = '';
   stockQuantity = 0;
   stockNote = '';
   stockType: 'entry' | 'exit' | 'adjust' = 'entry';
@@ -387,6 +407,18 @@ export class AdminPage implements OnInit {
 
   get totalOrderPages() {
     return Math.ceil(this.filteredOrders.length / this.ordersPerPage) || 1;
+  }
+
+  get filteredInventoryProducts() {
+    if (!this.inventorySearch) return this.products;
+    const q = this.inventorySearch.toLowerCase();
+    return this.products.filter(p =>
+      p.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q))
+    );
+  }
+
+  get selectedProduct() {
+    return this.products.find(p => p.id === this.inventoryProductId) || null;
   }
 
   refreshAll() {
@@ -429,6 +461,7 @@ export class AdminPage implements OnInit {
     this.selectedCategoryId = product.categories?.[0]?.id ?? '';
     this.productForm = {
       name: product.name,
+      sku: product.sku ?? '',
       description: product.description ?? '',
       price: Number(product.price),
       stock: Number(product.stock),
@@ -531,7 +564,24 @@ export class AdminPage implements OnInit {
   }
 
   private emptyProductForm(): ProductPayload {
-    return { name: '', description: '', price: 0, stock: 0, imageUrl: '', isActive: true, categoryIds: [] };
+    return { name: '', sku: '', description: '', price: 0, stock: 0, imageUrl: '', isActive: true, categoryIds: [] };
+  }
+
+  onInventorySearchChange() {
+    if (!this.inventorySearch) {
+      this.inventoryProductId = null;
+    }
+  }
+
+  selectInventoryProduct(product: Product) {
+    this.inventoryProductId = product.id;
+    this.inventorySearch = '';
+    this.loadMovements();
+  }
+
+  clearInventorySelection() {
+    this.inventoryProductId = null;
+    this.movements = [];
   }
 
   private setError(err: any) {

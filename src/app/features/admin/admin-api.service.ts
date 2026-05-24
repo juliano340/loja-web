@@ -6,6 +6,7 @@ import { Order } from '../../core/services/orders.service';
 
 export type ProductPayload = {
   name: string;
+  sku?: string;
   description?: string | null;
   price: number;
   stock: number;
