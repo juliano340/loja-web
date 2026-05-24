@@ -76,6 +76,17 @@ import { AuthService } from '../../../core/services/auth.service';
                   Meus pedidos
                 </a>
 
+                @if (auth.user()?.isAdmin) {
+                <a
+                  routerLink="/admin"
+                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  role="menuitem"
+                  (click)="closeAll()"
+                >
+                  Admin
+                </a>
+                }
+
                 <div class="border-t border-gray-200"></div>
 
                 <button
@@ -158,6 +169,9 @@ import { AuthService } from '../../../core/services/auth.service';
           <a routerLink="/products" class="mobile-menu-item" (click)="closeAll()"> Produtos </a>
 
           @if (auth.isAuthenticated()) {
+          @if (auth.user()?.isAdmin) {
+          <a routerLink="/admin" class="mobile-menu-item" (click)="closeAll()"> Admin </a>
+          }
           <a routerLink="/orders" class="mobile-menu-item" (click)="closeAll()"> Meus pedidos </a>
           <a routerLink="/profile" class="mobile-menu-item" (click)="closeAll()"> Meu perfil </a>
           <button type="button" class="mobile-menu-item text-left" (click)="openLogoutConfirm()">

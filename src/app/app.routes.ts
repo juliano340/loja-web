@@ -10,6 +10,7 @@ import { ProfilePage } from './features/profile/profile.page';
 import { ChangePasswordPage } from './features/profile/change-password.page';
 import { checkoutSuccessOnceGuard } from './features/checkout/checkout-success.guard';
 import { nonEmptyCartGuard } from './core/guards/non-empty-cart.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
@@ -30,6 +31,11 @@ export const routes: Routes = [
   { path: 'orders', component: OrdersPage, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'profile/password', component: ChangePasswordPage, canActivate: [authGuard] },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./features/admin/admin.page').then((m) => m.AdminPage),
+  },
 
   {
     path: 'checkout',

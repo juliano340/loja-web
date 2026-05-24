@@ -31,7 +31,11 @@ export class AuthService {
   private readonly _loadingUser = signal(false);
   readonly loadingUser = this._loadingUser.asReadonly();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    if (this._token()) {
+      queueMicrotask(() => this.loadMe());
+    }
+  }
 
   loadMe() {
     this._loadingUser.set(true);
