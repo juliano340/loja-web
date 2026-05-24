@@ -48,102 +48,90 @@ type Tab = 'products' | 'inventory' | 'orders';
         @if (loading) {
         <div class="card">Carregando operação...</div>
         } @else if (tab === 'products') {
-        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
-          <form class="card !p-4 form" (ngSubmit)="saveProduct()">
-            <h2 class="text-lg font-semibold text-gray-900">
-              @if (editingProductId) { Editar produto } @else { Novo produto }
-            </h2>
-
-            <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
-            <input
-              class="input"
-              name="price"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Preço"
-              [(ngModel)]="productForm.price"
-              required
-            />
-            <input
-              class="input"
-              name="stock"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="Estoque"
-              [(ngModel)]="productForm.stock"
-              required
-            />
-            <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
-            <textarea
-              class="input min-h-24"
-              name="description"
-              placeholder="Descrição"
-              [(ngModel)]="productForm.description"
-            ></textarea>
-
-            <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
-              <option value="">Categoria</option>
-              @for (category of categories; track category.id) {
-              <option [value]="category.id">{{ category.name }}</option>
-              }
-            </select>
-
-            <label class="flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" name="isActive" [(ngModel)]="productForm.isActive" />
-              Produto ativo
-            </label>
-
-            <button class="btn-primary" type="submit">
-              @if (saving) { Salvando... } @else if (editingProductId) { Salvar alterações } @else { Criar produto }
-            </button>
-            @if (editingProductId) {
-            <button class="btn-secondary" type="button" (click)="resetProductForm()">Cancelar edição</button>
-            }
-          </form>
-
-          <div class="card overflow-x-auto">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <h2 class="text-lg font-semibold text-gray-900">Produtos</h2>
+        <div class="card overflow-x-auto">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Produtos</h2>
+            <div class="flex items-center gap-3">
               <span class="text-sm text-gray-500">{{ products.length }} itens</span>
+              <button class="btn-primary sm:w-auto" type="button" (click)="openCreateProduct()">Novo produto</button>
             </div>
-            <table class="admin-table admin-table-fixed">
-              <thead>
-                <tr><th class="w-[38%]">Produto</th><th class="w-[12%]">Preço</th><th class="w-[25%]">Estoque</th><th class="w-[13%]">Status</th><th class="w-[12%]"></th></tr>
-              </thead>
-              <tbody>
-                @for (product of products; track product.id) {
-                <tr>
-                  <td>
-                    <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
-                    <div class="text-xs text-gray-500">#{{ product.id }}</div>
-                  </td>
-                  <td>R$ {{ product.price }}</td>
-                  <td>
-                    <div class="flex items-center gap-0.5">
-                      <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
-                      <span class="w-6 text-center tabular-nums text-xs">{{ product.stock }}</span>
-                      <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
-                      <button class="qty-btn qty-btn-sm" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge" [class.badge-off]="!product.isActive">
-                      {{ product.isActive ? 'Ativo' : 'Inativo' }}
-                    </span>
-                  </td>
-                  <td class="text-right whitespace-nowrap">
-                    <button class="link-btn" type="button" (click)="editProduct(product)">Editar</button>
-                  </td>
-                </tr>
-                } @empty {
-                <tr><td colspan="5" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
+          </div>
+          <table class="admin-table admin-table-fixed">
+            <thead>
+              <tr><th class="w-[38%]">Produto</th><th class="w-[12%]">Preço</th><th class="w-[25%]">Estoque</th><th class="w-[13%]">Status</th><th class="w-[12%]"></th></tr>
+            </thead>
+            <tbody>
+              @for (product of products; track product.id) {
+              <tr>
+                <td>
+                  <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
+                  <div class="text-xs text-gray-500">#{{ product.id }}</div>
+                </td>
+                <td>R$ {{ product.price }}</td>
+                <td>
+                  <div class="flex items-center gap-0.5">
+                    <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, -1)" title="-1">−</button>
+                    <span class="w-6 text-center tabular-nums text-xs">{{ product.stock }}</span>
+                    <button class="qty-btn" type="button" (click)="quickAdjustStock(product.id, +1)" title="+1">+</button>
+                    <button class="qty-btn qty-btn-sm" type="button" (click)="quickAdjustStock(product.id, +5)" title="+5">+5</button>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" [class.badge-off]="!product.isActive">
+                    {{ product.isActive ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td class="text-right whitespace-nowrap">
+                  <button class="link-btn" type="button" (click)="editProduct(product)">Editar</button>
+                </td>
+              </tr>
+              } @empty {
+              <tr><td colspan="5" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (showProductModal) {
+        <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
+          <div class="absolute inset-0 bg-black/40" (click)="closeProductModal()"></div>
+          <div class="relative w-full max-w-lg rounded-xl bg-white border border-gray-200 shadow-xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="text-lg font-semibold text-gray-900">
+                @if (editingProductId) { Editar produto } @else { Novo produto }
+              </h2>
+              <button type="button" class="text-gray-500 hover:text-gray-700 transition" (click)="closeProductModal()" aria-label="Fechar">✕</button>
+            </div>
+
+            <form class="form" (ngSubmit)="saveProduct()">
+              <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
+              <input class="input" name="price" type="number" min="0" step="0.01" placeholder="Preço" [(ngModel)]="productForm.price" required />
+              <input class="input" name="stock" type="number" min="0" step="1" placeholder="Estoque" [(ngModel)]="productForm.stock" required />
+              <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
+              <textarea class="input min-h-24" name="description" placeholder="Descrição" [(ngModel)]="productForm.description"></textarea>
+
+              <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
+                <option value="">Categoria</option>
+                @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
                 }
-              </tbody>
-            </table>
+              </select>
+
+              <label class="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" name="isActive" [(ngModel)]="productForm.isActive" />
+                Produto ativo
+              </label>
+
+              <div class="flex items-center gap-3 pt-2">
+                <button class="btn-primary" type="submit">
+                  @if (saving) { Salvando... } @else if (editingProductId) { Salvar alterações } @else { Criar produto }
+                </button>
+                <button class="btn-secondary sm:w-auto" type="button" (click)="closeProductModal()">Cancelar</button>
+              </div>
+            </form>
           </div>
         </div>
+        }
         } @else if (tab === 'inventory') {
         <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
           <div class="card !p-4 form">
@@ -324,6 +312,7 @@ export class AdminPage implements OnInit {
   orderFilter = 'ALL';
   orderPage = 1;
   ordersPerPage = 10;
+  showProductModal = false;
 
   constructor(private api: AdminApiService) {}
 
@@ -392,6 +381,17 @@ export class AdminPage implements OnInit {
       isActive: product.isActive,
       categoryIds: product.categories?.map((c) => c.id) ?? [],
     };
+    this.showProductModal = true;
+  }
+
+  openCreateProduct() {
+    this.resetProductForm();
+    this.showProductModal = true;
+  }
+
+  closeProductModal() {
+    this.showProductModal = false;
+    this.resetProductForm();
   }
 
   resetProductForm() {
