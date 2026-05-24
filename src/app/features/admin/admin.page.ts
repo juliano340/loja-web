@@ -111,15 +111,27 @@ type Tab = 'products' | 'inventory' | 'orders';
                 </div>
 
                 <form class="form" (ngSubmit)="saveProduct()">
-                  <input class="input" name="name" placeholder="Nome" [(ngModel)]="productForm.name" required />
-                  <input class="input" name="sku" placeholder="SKU (opcional)" [(ngModel)]="productForm.sku" />
-                  <input class="input" name="price" type="number" min="0" step="0.01" placeholder="Preço" [(ngModel)]="productForm.price" required />
-                  <input class="input" name="stock" type="number" min="0" step="1" placeholder="Estoque" [(ngModel)]="productForm.stock" required />
-                  <input class="input" name="imageUrl" placeholder="URL da imagem" [(ngModel)]="productForm.imageUrl" />
-                  <textarea class="input min-h-24" name="description" placeholder="Descrição" [(ngModel)]="productForm.description"></textarea>
+                  <label class="text-xs font-medium text-gray-500">Nome</label>
+                  <input class="input" name="name" [(ngModel)]="productForm.name" required />
 
+                  <label class="text-xs font-medium text-gray-500">SKU</label>
+                  <input class="input" name="sku" [(ngModel)]="productForm.sku" />
+
+                  <label class="text-xs font-medium text-gray-500">Preço</label>
+                  <input class="input" name="price" type="number" min="0" step="0.01" [(ngModel)]="productForm.price" required />
+
+                  <label class="text-xs font-medium text-gray-500">Estoque</label>
+                  <input class="input" name="stock" type="number" min="0" step="1" [(ngModel)]="productForm.stock" required />
+
+                  <label class="text-xs font-medium text-gray-500">URL da imagem</label>
+                  <input class="input" name="imageUrl" [(ngModel)]="productForm.imageUrl" />
+
+                  <label class="text-xs font-medium text-gray-500">Descrição</label>
+                  <textarea class="input min-h-24" name="description" [(ngModel)]="productForm.description"></textarea>
+
+                  <label class="text-xs font-medium text-gray-500">Categoria</label>
                   <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
-                    <option value="">Categoria</option>
+                    <option value="">Selecione</option>
                     @for (category of categories; track category.id) {
                     <option [value]="category.id">{{ category.name }}</option>
                     }
