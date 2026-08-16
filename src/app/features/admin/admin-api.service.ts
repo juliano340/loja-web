@@ -28,6 +28,48 @@ export type StockMovement = {
   createdAt: string;
 };
 
+export type DashboardKpis = {
+  revenue: string;
+  pendingOrders: number;
+  paidToday: number;
+  lowStockCount: number;
+  activeProducts: number;
+};
+
+export type Coupon = {
+  id: number;
+  code: string;
+  type: 'PERCENT' | 'FIXED';
+  value: string;
+  isActive: boolean;
+  startsAt: string | null;
+  expiresAt: string | null;
+  maxRedemptions: number | null;
+  maxRedemptionsPerUser: number | null;
+  minSubtotal: string | null;
+  maxDiscount: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CouponPayload = {
+  code: string;
+  type: 'PERCENT' | 'FIXED';
+  value: string;
+  isActive?: boolean;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+  maxRedemptions?: number | null;
+  maxRedemptionsPerUser?: number | null;
+  minSubtotal?: string | null;
+  maxDiscount?: string | null;
+};
+
+export type CategoryPayload = {
+  name: string;
+  slug?: string;
+};
+
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
   constructor(private http: HttpClient) {}
@@ -42,14 +84,6 @@ export class AdminApiService {
 
   updateProduct(id: number, payload: Partial<ProductPayload>) {
     return this.http.patch<Product>(`/api/products/${id}`, payload);
-  }
-
-  listCategories() {
-    return this.http.get<Category[]>('/api/categories');
-  }
-
-  createCategory(payload: { name: string; slug: string }) {
-    return this.http.post<Category>('/api/categories', payload);
   }
 
   getInventory(productId: number) {
@@ -77,5 +111,41 @@ export class AdminApiService {
 
   cancelExpiredOrders() {
     return this.http.post<number>('/api/orders/cancel-expired', {});
+  }
+
+  getDashboard() {
+    return this.http.get<DashboardKpis>('/api/admin/dashboard');
+  }
+
+  listCategories() {
+    return this.http.get<Category[]>('/api/categories');
+  }
+
+  createCategory(payload: CategoryPayload) {
+    return this.http.post<Category>('/api/categories', payload);
+  }
+
+  updateCategory(id: string, payload: CategoryPayload) {
+    return this.http.patch<Category>(`/api/categories/${id}`, payload);
+  }
+
+  deleteCategory(id: string) {
+    return this.http.delete<{ ok: boolean }>(`/api/categories/${id}`);
+  }
+
+  listCoupons() {
+    return this.http.get<Coupon[]>('/api/coupons');
+  }
+
+  createCoupon(payload: CouponPayload) {
+    return this.http.post<Coupon>('/api/coupons', payload);
+  }
+
+  updateCoupon(id: number, payload: Partial<CouponPayload>) {
+    return this.http.patch<Coupon>(`/api/coupons/${id}`, payload);
+  }
+
+  deleteCoupon(id: number) {
+    return this.http.delete<{ ok: boolean }>(`/api/coupons/${id}`);
   }
 }

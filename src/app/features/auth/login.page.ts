@@ -13,7 +13,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
         <h1 class="mb-4 text-lg font-semibold">Login</h1>
 
         @if (success) {
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
           Conta criada com sucesso. Agora entre com seu email e senha.
         </div>
         }
@@ -46,9 +46,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
           </button>
         </form>
 
-        <p class="mt-4 text-sm text-center text-gray-600">
+        <p class="mt-4 text-sm text-center text-ink-600">
           Não tem conta?
-          <a routerLink="/register" class="text-blue-600 hover:underline font-medium">
+          <a routerLink="/register" class="text-brand-600 hover:underline font-medium">
             Cadastre-se
           </a>
         </p>

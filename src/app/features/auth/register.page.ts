@@ -70,9 +70,9 @@ import { RouterLink } from '@angular/router';
         </form>
 
         <!-- 🔗 LINK PARA LOGIN -->
-        <p class="mt-4 text-sm text-center text-gray-600">
+        <p class="mt-4 text-sm text-center text-ink-600">
           Já tem conta?
-          <a routerLink="/login" class="text-blue-600 hover:underline font-medium"> Fazer login </a>
+          <a routerLink="/login" class="text-brand-600 hover:underline font-medium"> Fazer login </a>
         </p>
       </div>
     </div>

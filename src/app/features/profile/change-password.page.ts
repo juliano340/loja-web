@@ -13,36 +13,36 @@ import { RouterLink } from '@angular/router';
         <!-- Topbar -->
         <header class="flex items-start justify-between gap-4">
           <div>
-            <a routerLink="/profile" class="text-sm text-gray-600 hover:text-gray-900">
+            <a routerLink="/profile" class="text-sm text-ink-600 hover:text-ink-900">
               ← Voltar para perfil
             </a>
-            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 mt-2">Trocar senha</h1>
-            <p class="text-sm text-gray-500 mt-1">
+            <h1 class="text-2xl sm:text-3xl font-semibold text-ink-900 mt-2">Trocar senha</h1>
+            <p class="text-sm text-ink-500 mt-1">
               Para sua segurança, confirme a senha atual e defina uma nova senha.
             </p>
           </div>
         </header>
 
         <div class="card max-w-2xl">
-          <h2 class="text-lg font-semibold text-gray-900">Segurança da conta</h2>
-          <p class="text-sm text-gray-500 mt-1">Use uma senha com pelo menos 6 caracteres.</p>
+          <h2 class="text-lg font-semibold text-ink-900">Segurança da conta</h2>
+          <p class="text-sm text-ink-500 mt-1">Use uma senha com pelo menos 6 caracteres.</p>
 
           <!-- Alerts -->
           @if (success) {
           <div
-            class="mt-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+            class="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
           >
             Senha atualizada com sucesso!
           </div>
           } @if (error) {
           <div
-            class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
           >
             {{ error }}
           </div>
           } @if (passwordMismatch) {
           <div
-            class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+            class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
           >
             As senhas não conferem.
           </div>
@@ -50,7 +50,7 @@ import { RouterLink } from '@angular/router';
 
           <form class="form mt-5" (ngSubmit)="submit()" #form="ngForm">
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Senha atual</label>
+              <label class="text-sm font-medium text-ink-700">Senha atual</label>
               <input
                 class="input"
                 type="password"
@@ -67,7 +67,7 @@ import { RouterLink } from '@angular/router';
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Nova senha</label>
+              <label class="text-sm font-medium text-ink-700">Nova senha</label>
               <input
                 class="input"
                 type="password"
@@ -85,7 +85,7 @@ import { RouterLink } from '@angular/router';
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Confirmar nova senha</label>
+              <label class="text-sm font-medium text-ink-700">Confirmar nova senha</label>
               <input
                 class="input"
                 type="password"
@@ -112,7 +112,7 @@ import { RouterLink } from '@angular/router';
 
               <a routerLink="/profile" class="btn-secondary sm:w-auto text-center"> Cancelar </a>
 
-              <span class="text-xs text-gray-500 sm:ml-auto">
+              <span class="text-xs text-ink-500 sm:ml-auto">
                 Dica: evite reutilizar senhas antigas.
               </span>
             </div>

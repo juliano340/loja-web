@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -14,19 +15,21 @@ type SortKey = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
   standalone: true,
   imports: [ProductCardComponent, FormsModule],
   template: `
-    <section class="max-w-7xl mx-auto px-4 py-6 sm:px-6">
+    <section class="max-w-7xl mx-auto px-4 py-8 sm:px-6">
       <!-- Header -->
-      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-8">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900">Produtos</h1>
-          <p class="text-sm text-gray-600 mt-1">Encontre o que você precisa com rapidez.</p>
+          <p class="section-kicker">Catálogo</p>
+          <h1 class="section-title !text-4xl">Produtos</h1>
+          <p class="text-sm text-ink-500 mt-2">
+            {{ filteredProducts().length }} produto(s) disponíve{{ filteredProducts().length === 1 ? 'l' : 'is' }}.
+          </p>
         </div>
 
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <input
-            class="w-full sm:w-72 border border-gray-300 rounded-md px-3 py-2 bg-white
-                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full sm:w-72 border border-ink-200 rounded-lg px-3.5 py-2.5 bg-white text-ink-900 placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             type="search"
             placeholder="Buscar produto..."
             [(ngModel)]="query"
@@ -34,8 +37,7 @@ type SortKey = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
           <!-- Categoria -->
           <select
-            class="w-full sm:w-56 border border-gray-300 rounded-md px-3 py-2 bg-white
-                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full sm:w-56 border border-ink-200 rounded-lg px-3.5 py-2.5 bg-white text-ink-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             [(ngModel)]="selectedCategorySlug"
           >
             <option value="">Todas categorias</option>
@@ -46,8 +48,7 @@ type SortKey = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
 
           <!-- Ordenação -->
           <select
-            class="w-full sm:w-48 border border-gray-300 rounded-md px-3 py-2 bg-white
-                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full sm:w-48 border border-ink-200 rounded-lg px-3.5 py-2.5 bg-white text-ink-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             [(ngModel)]="sortKey"
           >
             <option value="relevance">Relevância</option>
@@ -62,42 +63,37 @@ type SortKey = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc';
       @if (loading) {
       <div class="py-10">
         <div
-          class="grid gap-4"
+          class="grid gap-5"
           [style.gridTemplateColumns]="'repeat(auto-fill, minmax(220px, 1fr))'"
         >
           @for (i of skeleton; track i) {
-          <div
-            class="bg-white border border-gray-200 rounded-lg h-[260px] relative overflow-hidden"
-          >
-            <div
-              class="absolute inset-0 -translate-x-full animate-[shimmer_1.2s_infinite]
-                         bg-[linear-gradient(90deg,transparent,rgba(0,0,0,0.06),transparent)]"
-            ></div>
+          <div class="skeleton h-[320px]">
+            <div class="skeleton-shimmer"></div>
           </div>
           }
         </div>
       </div>
       } @else if (error) {
       <div class="py-10">
-        <div class="bg-white border border-gray-200 rounded-lg p-6 max-w-md">
-          <p class="text-base font-semibold text-gray-900 mb-1">
+        <div class="card !max-w-md">
+          <p class="text-base font-bold text-ink-900 mb-1">
             Não foi possível carregar os produtos.
           </p>
-          <p class="text-sm text-gray-600 mb-4">Tente novamente.</p>
+          <p class="text-sm text-ink-500 mb-4">Tente novamente.</p>
           <button class="btn-primary" (click)="reload()">Recarregar</button>
         </div>
       </div>
       } @else if (filteredProducts().length === 0) {
       <div class="py-10">
-        <div class="bg-white border border-gray-200 rounded-lg p-6 max-w-md">
-          <p class="text-base font-semibold text-gray-900 mb-1">Nenhum produto encontrado.</p>
-          <p class="text-sm text-gray-600 mb-4">Tente mudar a busca, a categoria ou a ordenação.</p>
+        <div class="empty-state !max-w-md mx-auto">
+          <p class="empty-state-title">Nenhum produto encontrado.</p>
+          <p class="empty-state-text">Tente mudar a busca, a categoria ou a ordenação.</p>
           <button class="btn-primary" (click)="clearFilters()">Limpar filtros</button>
         </div>
       </div>
       } @else {
       <!-- Grid -->
-      <div class="grid gap-4" [style.gridTemplateColumns]="'repeat(auto-fill, minmax(220px, 1fr))'">
+      <div class="grid gap-5" [style.gridTemplateColumns]="'repeat(auto-fill, minmax(220px, 1fr))'">
         @for (product of filteredProducts(); track product.id) {
         <app-product-card [product]="product" />
         }
@@ -121,10 +117,18 @@ export class ProductsPage implements OnInit {
 
   constructor(
     private productsService: ProductsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const categoria = params.get('categoria');
+      if (categoria) {
+        this.selectedCategorySlug = categoria;
+      }
+    });
+
     this.load();
   }
 

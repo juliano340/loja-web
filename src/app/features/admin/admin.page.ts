@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AdminApiService, ProductPayload, StockMovement } from './admin-api.service';
+import { AdminApiService, ProductPayload, StockMovement, DashboardKpis, Coupon, CouponPayload, CategoryPayload } from './admin-api.service';
 import { Product } from '../../core/services/products.service';
 import { Category } from '../../core/services/categories.service';
 import { Order } from '../../core/services/orders.service';
 
-type Tab = 'products' | 'inventory' | 'orders';
+type Tab = 'dashboard' | 'products' | 'inventory' | 'categories' | 'coupons' | 'orders';
 
 @Component({
   standalone: true,
@@ -16,11 +16,11 @@ type Tab = 'products' | 'inventory' | 'orders';
     <section class="page !items-stretch">
       <div class="w-full max-w-7xl mx-auto px-4 py-6">
         @if (message) {
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
           {{ message }}
         </div>
         } @if (error) {
-        <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {{ error }}
         </div>
         }
@@ -29,7 +29,12 @@ type Tab = 'products' | 'inventory' | 'orders';
           <!-- SIDEBAR -->
           <aside class="w-52 flex-shrink-0">
             <nav class="sticky top-6 space-y-1">
-              <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin</p>
+              <p class="px-3 text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Admin</p>
+
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'dashboard'" (click)="tab = 'dashboard'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Visão Geral
+              </button>
 
               <button class="sidebar-link" [class.sidebar-active]="tab === 'products'" (click)="tab = 'products'">
                 <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
@@ -39,6 +44,16 @@ type Tab = 'products' | 'inventory' | 'orders';
               <button class="sidebar-link" [class.sidebar-active]="tab === 'inventory'" (click)="tab = 'inventory'">
                 <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2a2 2 0 0 0 1 1.73"/><path d="M21 16v2a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 18v-2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 Estoque
+              </button>
+
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'categories'" (click)="tab = 'categories'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Categorias
+              </button>
+
+              <button class="sidebar-link" [class.sidebar-active]="tab === 'coupons'" (click)="tab = 'coupons'">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                Cupons
               </button>
 
               <button class="sidebar-link" [class.sidebar-active]="tab === 'orders'" (click)="tab = 'orders'">
@@ -52,14 +67,43 @@ type Tab = 'products' | 'inventory' | 'orders';
           <main class="flex-1 min-w-0">
             @if (loading) {
             <div class="card">Carregando...</div>
+            } @else if (tab === 'dashboard') {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-ink-950">Visão Geral</h1>
+              <p class="text-sm text-ink-500 mt-1">Acompanhe os indicadores da loja.</p>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="kpi-card">
+                <p class="kpi-label">Receita Total</p>
+                <p class="kpi-value">R$ {{ dashboard?.revenue ?? '—' }}</p>
+              </div>
+              <div class="kpi-card">
+                <p class="kpi-label">Pedidos Pendentes</p>
+                <p class="kpi-value">{{ dashboard?.pendingOrders ?? 0 }}</p>
+              </div>
+              <div class="kpi-card">
+                <p class="kpi-label">Pagos Hoje</p>
+                <p class="kpi-value">{{ dashboard?.paidToday ?? 0 }}</p>
+              </div>
+              <div class="kpi-card">
+                <p class="kpi-label">Estoque Baixo</p>
+                <p class="kpi-value text-amber-600">{{ dashboard?.lowStockCount ?? 0 }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="kpi-card">
+                <p class="kpi-label">Produtos Ativos</p>
+                <p class="kpi-value">{{ dashboard?.activeProducts ?? 0 }}</p>
+              </div>
+            </div>
             } @else if (tab === 'products') {
             <div class="mb-6">
-              <h1 class="text-2xl font-semibold text-gray-950">Produtos</h1>
-              <p class="text-sm text-gray-500 mt-1">Gerencie o catálogo de produtos da loja.</p>
+              <h1 class="text-2xl font-semibold text-ink-950">Produtos</h1>
+              <p class="text-sm text-ink-500 mt-1">Gerencie o catálogo de produtos da loja.</p>
             </div>
             <div class="card !max-w-none overflow-x-auto">
               <div class="flex items-center justify-between gap-3 mb-4">
-                <span class="text-sm text-gray-500">{{ products.length }} itens</span>
+                <span class="text-sm text-ink-500">{{ products.length }} itens</span>
                 <button class="btn-primary sm:w-auto" type="button" (click)="openCreateProduct()">Novo produto</button>
               </div>
               <table class="admin-table">
@@ -70,10 +114,10 @@ type Tab = 'products' | 'inventory' | 'orders';
                   @for (product of products; track product.id) {
                   <tr>
                     <td>
-                      <div class="font-medium text-gray-900 truncate" [title]="product.name">{{ product.name }}</div>
-                      <div class="text-xs text-gray-500">#{{ product.id }}</div>
+                      <div class="font-medium text-ink-900 truncate" [title]="product.name">{{ product.name }}</div>
+                      <div class="text-xs text-ink-500">#{{ product.id }}</div>
                     </td>
-                    <td class="text-xs font-mono text-gray-500">{{ product.sku || '—' }}</td>
+                    <td class="text-xs font-mono text-ink-500">{{ product.sku || '—' }}</td>
                     <td>R$ {{ product.price }}</td>
                     <td>
                       <div class="flex items-center gap-0.5">
@@ -93,7 +137,7 @@ type Tab = 'products' | 'inventory' | 'orders';
                     </td>
                   </tr>
                   } @empty {
-                  <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum produto cadastrado.</td></tr>
+                  <tr><td colspan="6" class="text-center text-ink-500 py-6">Nenhum produto cadastrado.</td></tr>
                   }
                 </tbody>
               </table>
@@ -101,35 +145,35 @@ type Tab = 'products' | 'inventory' | 'orders';
 
             @if (showProductModal) {
             <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
-              <div class="absolute inset-0 bg-black/40" (click)="closeProductModal()"></div>
-              <div class="relative w-full max-w-lg rounded-xl bg-white border border-gray-200 shadow-xl p-6">
+              <div class="absolute inset-0 bg-ink-950/50" (click)="closeProductModal()"></div>
+              <div class="relative w-full max-w-lg rounded-xl bg-white border border-ink-100 shadow-xl p-6">
                 <div class="flex items-center justify-between mb-5">
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold text-ink-900">
                     @if (editingProductId) { Editar produto } @else { Novo produto }
                   </h2>
-                  <button type="button" class="text-gray-500 hover:text-gray-700 transition" (click)="closeProductModal()" aria-label="Fechar"></button>
+                  <button type="button" class="text-ink-500 hover:text-ink-700 transition" (click)="closeProductModal()" aria-label="Fechar"></button>
                 </div>
 
                 <form class="form" (ngSubmit)="saveProduct()">
-                  <label class="text-xs font-medium text-gray-500">Nome</label>
+                  <label class="text-xs font-medium text-ink-500">Nome</label>
                   <input class="input" name="name" [(ngModel)]="productForm.name" required />
 
-                  <label class="text-xs font-medium text-gray-500">SKU</label>
+                  <label class="text-xs font-medium text-ink-500">SKU</label>
                   <input class="input" name="sku" [(ngModel)]="productForm.sku" />
 
-                  <label class="text-xs font-medium text-gray-500">Preço</label>
+                  <label class="text-xs font-medium text-ink-500">Preço</label>
                   <input class="input" name="price" type="number" min="0" step="0.01" [(ngModel)]="productForm.price" required />
 
-                  <label class="text-xs font-medium text-gray-500">Estoque</label>
+                  <label class="text-xs font-medium text-ink-500">Estoque</label>
                   <input class="input" name="stock" type="number" min="0" step="1" [(ngModel)]="productForm.stock" required />
 
-                  <label class="text-xs font-medium text-gray-500">URL da imagem</label>
+                  <label class="text-xs font-medium text-ink-500">URL da imagem</label>
                   <input class="input" name="imageUrl" [(ngModel)]="productForm.imageUrl" />
 
-                  <label class="text-xs font-medium text-gray-500">Descrição</label>
+                  <label class="text-xs font-medium text-ink-500">Descrição</label>
                   <textarea class="input min-h-24" name="description" [(ngModel)]="productForm.description"></textarea>
 
-                  <label class="text-xs font-medium text-gray-500">Categoria</label>
+                  <label class="text-xs font-medium text-ink-500">Categoria</label>
                   <select class="input" name="categoryId" [(ngModel)]="selectedCategoryId" required>
                     <option value="">Selecione</option>
                     @for (category of categories; track category.id) {
@@ -137,7 +181,7 @@ type Tab = 'products' | 'inventory' | 'orders';
                     }
                   </select>
 
-                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                  <label class="flex items-center gap-2 text-sm text-ink-700">
                     <input type="checkbox" name="isActive" [(ngModel)]="productForm.isActive" />
                     Produto ativo
                   </label>
@@ -154,14 +198,14 @@ type Tab = 'products' | 'inventory' | 'orders';
             }
             } @else if (tab === 'inventory') {
             <div class="mb-6">
-              <h1 class="text-2xl font-semibold text-gray-950">Estoque</h1>
-              <p class="text-sm text-gray-500 mt-1">Registre entradas, saídas e ajustes de saldo.</p>
+              <h1 class="text-2xl font-semibold text-ink-950">Estoque</h1>
+              <p class="text-sm text-ink-500 mt-1">Registre entradas, saídas e ajustes de saldo.</p>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
               <div class="card !p-4 form">
-                <h2 class="text-lg font-semibold text-gray-900">Lançamento</h2>
+                <h2 class="text-lg font-semibold text-ink-900">Lançamento</h2>
 
-                <label class="text-xs font-medium text-gray-500">Produto</label>
+                <label class="text-xs font-medium text-ink-500">Produto</label>
                 <div class="relative">
                   <input
                     #comboboxInput
@@ -174,31 +218,31 @@ type Tab = 'products' | 'inventory' | 'orders';
                     (blur)="onComboboxBlur()"
                   />
                   @if (inventoryProductId) {
-                  <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500" (click)="clearInventorySelection()">✕</button>
+                  <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400 hover:text-red-500" (click)="clearInventorySelection()">✕</button>
                   }
                   @if (inventoryComboboxOpen && filteredInventoryProducts.length > 0) {
-                  <div class="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-lg">
+                  <div class="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto border border-ink-100 rounded-lg bg-white shadow-lg">
                     @for (product of filteredInventoryProducts; track product.id) {
-                    <button type="button" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0 transition" [class.bg-blue-50]="inventoryProductId === product.id" [class.font-medium]="inventoryProductId === product.id" (mousedown)="selectInventoryProduct(product)">
+                    <button type="button" class="w-full text-left px-3 py-2 text-sm hover:bg-ink-50 border-b border-gray-100 last:border-0 transition" [class.bg-blue-50]="inventoryProductId === product.id" [class.font-medium]="inventoryProductId === product.id" (mousedown)="selectInventoryProduct(product)">
                       <span>{{ product.name }}</span>
-                      @if (product.sku) { <span class="text-xs text-gray-400 ml-1">({{ product.sku }})</span> }
-                      <span class="text-xs text-gray-500 float-right">{{ product.stock }} un.</span>
+                      @if (product.sku) { <span class="text-xs text-ink-400 ml-1">({{ product.sku }})</span> }
+                      <span class="text-xs text-ink-500 float-right">{{ product.stock }} un.</span>
                     </button>
                     }
                   </div>
                   } @else if (inventoryComboboxOpen && inventorySearch) {
-                  <div class="absolute z-10 mt-1 w-full border border-gray-200 rounded-md bg-white shadow-lg px-3 py-4 text-sm text-gray-400 text-center">Nenhum produto encontrado.</div>
+                  <div class="absolute z-10 mt-1 w-full border border-ink-100 rounded-lg bg-white shadow-lg px-3 py-4 text-sm text-ink-400 text-center">Nenhum produto encontrado.</div>
                   }
                 </div>
 
-                <label class="text-xs font-medium text-gray-500">Tipo</label>
+                <label class="text-xs font-medium text-ink-500">Tipo</label>
                 <div class="flex gap-2">
                   <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'entry'" (click)="stockType = 'entry'">Entrada</button>
                   <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'exit'" (click)="stockType = 'exit'">Saída</button>
                   <button type="button" class="stock-type-btn" [class.stock-type-active]="stockType === 'adjust'" (click)="stockType = 'adjust'">Ajuste</button>
                 </div>
 
-                <label class="text-xs font-medium text-gray-500">Origem</label>
+                <label class="text-xs font-medium text-ink-500">Origem</label>
                 <select class="input" [(ngModel)]="stockOrigin" name="stockOrigin">
                   @if (stockType === 'entry') {
                   <option value="purchase">Compra</option>
@@ -216,10 +260,10 @@ type Tab = 'products' | 'inventory' | 'orders';
                   }
                 </select>
 
-                <label class="text-xs font-medium text-gray-500">Quantidade</label>
+                <label class="text-xs font-medium text-ink-500">Quantidade</label>
                 <input class="input" type="number" min="1" step="1" name="stockQuantity" placeholder="0" [(ngModel)]="stockQuantity" />
 
-                <label class="text-xs font-medium text-gray-500">Observação</label>
+                <label class="text-xs font-medium text-ink-500">Observação</label>
                 <input class="input" name="stockNote" placeholder="Opcional" [(ngModel)]="stockNote" />
 
                 <button class="btn-primary" type="button" [disabled]="!inventoryProductId || !stockQuantity" (click)="adjustStock()">
@@ -228,7 +272,7 @@ type Tab = 'products' | 'inventory' | 'orders';
               </div>
 
               <div class="card !max-w-none overflow-x-auto">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Movimentações</h2>
+                <h2 class="text-lg font-semibold text-ink-900 mb-4">Movimentações</h2>
                 <table class="admin-table">
                   <thead>
                     <tr><th>Data</th><th>Tipo</th><th>Origem</th><th>Qtd</th><th>Antes</th><th>Depois</th><th>Nota</th></tr>
@@ -245,16 +289,192 @@ type Tab = 'products' | 'inventory' | 'orders';
                       <td>{{ movement.note || '-' }}</td>
                     </tr>
                     } @empty {
-                    <tr><td colspan="7" class="text-center text-gray-500 py-6">Selecione um produto.</td></tr>
+                    <tr><td colspan="7" class="text-center text-ink-500 py-6">Selecione um produto.</td></tr>
                     }
                   </tbody>
                 </table>
               </div>
             </div>
+            } @else if (tab === 'categories') {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-ink-950">Categorias</h1>
+              <p class="text-sm text-ink-500 mt-1">Gerencie as categorias de produtos.</p>
+            </div>
+            <div class="card !max-w-none overflow-x-auto">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-ink-500">{{ categories.length }} itens</span>
+                <button class="btn-primary sm:w-auto" type="button" (click)="openCategoryModal()">Nova categoria</button>
+              </div>
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Nome</th><th>Slug</th><th>Criada em</th><th></th></tr>
+                </thead>
+                <tbody>
+                  @for (category of categories; track category.id) {
+                  <tr>
+                    <td class="font-medium text-ink-900">{{ category.name }}</td>
+                    <td class="text-xs font-mono text-ink-500">{{ category.slug }}</td>
+                    <td class="text-sm text-ink-500">{{ category.createdAt | date:'short' }}</td>
+                    <td class="text-right whitespace-nowrap">
+                      <button class="link-btn mr-3" type="button" (click)="editCategory(category)">Editar</button>
+                      <button class="link-btn !text-red-600" type="button" (click)="deleteCategory(category)">Remover</button>
+                    </td>
+                  </tr>
+                  } @empty {
+                  <tr><td colspan="4" class="text-center text-ink-500 py-6">Nenhuma categoria cadastrada.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            @if (showCategoryModal) {
+            <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
+              <div class="absolute inset-0 bg-ink-950/50" (click)="closeCategoryModal()"></div>
+              <div class="relative w-full max-w-md rounded-xl bg-white border border-ink-100 shadow-xl p-6">
+                <div class="flex items-center justify-between mb-5">
+                  <h2 class="text-lg font-semibold text-ink-900">
+                    @if (editingCategoryId) { Editar categoria } @else { Nova categoria }
+                  </h2>
+                  <button type="button" class="text-ink-500 hover:text-ink-700 transition" (click)="closeCategoryModal()" aria-label="Fechar"></button>
+                </div>
+                <form class="form" (ngSubmit)="saveCategory()">
+                  <label class="text-xs font-medium text-ink-500">Nome</label>
+                  <input class="input" name="categoryName" [(ngModel)]="categoryForm.name" required />
+
+                  <label class="text-xs font-medium text-ink-500">Slug <span class="text-ink-400">(opcional)</span></label>
+                  <input class="input" name="categorySlug" [(ngModel)]="categoryForm.slug" placeholder="gerado automaticamente" />
+
+                  <div class="flex items-center gap-3 pt-2">
+                    <button class="btn-primary" type="submit">
+                      @if (saving) { Salvando... } @else if (editingCategoryId) { Salvar } @else { Criar }
+                    </button>
+                    <button class="btn-secondary sm:w-auto" type="button" (click)="closeCategoryModal()">Cancelar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            }
+            } @else if (tab === 'coupons') {
+            <div class="mb-6">
+              <h1 class="text-2xl font-semibold text-ink-950">Cupons</h1>
+              <p class="text-sm text-ink-500 mt-1">Gerencie cupons de desconto.</p>
+            </div>
+            <div class="card !max-w-none overflow-x-auto">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <span class="text-sm text-ink-500">{{ coupons.length }} cupons</span>
+                <button class="btn-primary sm:w-auto" type="button" (click)="openCouponModal()">Novo cupom</button>
+              </div>
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Status</th><th>Validade</th><th></th></tr>
+                </thead>
+                <tbody>
+                  @for (coupon of coupons; track coupon.id) {
+                  <tr>
+                    <td class="font-mono font-medium text-ink-900">{{ coupon.code }}</td>
+                    <td>
+                      <span class="badge" [class.badge-off]="coupon.type === 'FIXED'">
+                        {{ coupon.type === 'PERCENT' ? '%' : 'R$' }}
+                      </span>
+                    </td>
+                    <td>{{ coupon.type === 'PERCENT' ? coupon.value + '%' : 'R$ ' + coupon.value }}</td>
+                    <td>
+                      <span class="badge" [class.badge-off]="!coupon.isActive">
+                        {{ coupon.isActive ? 'Ativo' : 'Inativo' }}
+                      </span>
+                    </td>
+                    <td class="text-xs text-ink-500">
+                      @if (coupon.startsAt || coupon.expiresAt) {
+                        {{ coupon.startsAt ? (coupon.startsAt | date:'shortDate') : '—' }} até {{ coupon.expiresAt ? (coupon.expiresAt | date:'shortDate') : '—' }}
+                      } @else { — }
+                    </td>
+                    <td class="text-right whitespace-nowrap">
+                      <button class="link-btn mr-3" type="button" (click)="editCoupon(coupon)">Editar</button>
+                      <button class="link-btn !text-red-600" type="button" (click)="deleteCoupon(coupon)">Remover</button>
+                    </td>
+                  </tr>
+                  } @empty {
+                  <tr><td colspan="6" class="text-center text-ink-500 py-6">Nenhum cupom cadastrado.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            @if (showCouponModal) {
+            <div class="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-10 pb-10 overflow-y-auto" role="dialog" aria-modal="true">
+              <div class="absolute inset-0 bg-ink-950/50" (click)="closeCouponModal()"></div>
+              <div class="relative w-full max-w-lg rounded-xl bg-white border border-ink-100 shadow-xl p-6">
+                <div class="flex items-center justify-between mb-5">
+                  <h2 class="text-lg font-semibold text-ink-900">
+                    @if (editingCouponId) { Editar cupom } @else { Novo cupom }
+                  </h2>
+                  <button type="button" class="text-ink-500 hover:text-ink-700 transition" (click)="closeCouponModal()" aria-label="Fechar"></button>
+                </div>
+                <form class="form" (ngSubmit)="saveCoupon()">
+                  <label class="text-xs font-medium text-ink-500">Código</label>
+                  <input class="input" name="couponCode" [(ngModel)]="couponForm.code" placeholder="BEMVINDO10" required />
+
+                  <label class="text-xs font-medium text-ink-500">Tipo</label>
+                  <div class="flex gap-2">
+                    <button type="button" class="stock-type-btn" [class.stock-type-active]="couponForm.type === 'PERCENT'" (click)="couponForm.type = 'PERCENT'">Percentual (%)</button>
+                    <button type="button" class="stock-type-btn" [class.stock-type-active]="couponForm.type === 'FIXED'" (click)="couponForm.type = 'FIXED'">Fixo (R$)</button>
+                  </div>
+
+                  <label class="text-xs font-medium text-ink-500">Valor</label>
+                  <input class="input" name="couponValue" type="number" min="0" step="0.01" [(ngModel)]="couponForm.value" required />
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Início</label>
+                      <input class="input" name="couponStartsAt" type="datetime-local" [(ngModel)]="couponForm.startsAt" />
+                    </div>
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Expira em</label>
+                      <input class="input" name="couponExpiresAt" type="datetime-local" [(ngModel)]="couponForm.expiresAt" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Máx. resgates</label>
+                      <input class="input" name="couponMaxRedemptions" type="number" min="0" step="1" placeholder="Ilimitado" [(ngModel)]="couponForm.maxRedemptions" />
+                    </div>
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Máx. por usuário</label>
+                      <input class="input" name="couponMaxPerUser" type="number" min="0" step="1" placeholder="Ilimitado" [(ngModel)]="couponForm.maxRedemptionsPerUser" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Subtotal mínimo</label>
+                      <input class="input" name="couponMinSubtotal" type="number" min="0" step="0.01" placeholder="0.00" [(ngModel)]="couponForm.minSubtotal" />
+                    </div>
+                    <div>
+                      <label class="text-xs font-medium text-ink-500">Desconto máximo</label>
+                      <input class="input" name="couponMaxDiscount" type="number" min="0" step="0.01" placeholder="0.00" [(ngModel)]="couponForm.maxDiscount" />
+                    </div>
+                  </div>
+
+                  <label class="flex items-center gap-2 text-sm text-ink-700">
+                    <input type="checkbox" name="couponIsActive" [(ngModel)]="couponForm.isActive" />
+                    Cupom ativo
+                  </label>
+
+                  <div class="flex items-center gap-3 pt-2">
+                    <button class="btn-primary" type="submit">
+                      @if (saving) { Salvando... } @else if (editingCouponId) { Salvar } @else { Criar }
+                    </button>
+                    <button class="btn-secondary sm:w-auto" type="button" (click)="closeCouponModal()">Cancelar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            }
             } @else {
             <div class="mb-6">
-              <h1 class="text-2xl font-semibold text-gray-950">Pedidos</h1>
-              <p class="text-sm text-gray-500 mt-1">Gerencie pedidos e acompanhe pagamentos.</p>
+              <h1 class="text-2xl font-semibold text-ink-950">Pedidos</h1>
+              <p class="text-sm text-ink-500 mt-1">Gerencie pedidos e acompanhe pagamentos.</p>
             </div>
             <div class="card !max-w-none overflow-x-auto">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -294,10 +514,10 @@ type Tab = 'products' | 'inventory' | 'orders';
                   </tr>
                   @if (selectedOrderId === order.id) {
                   <tr>
-                    <td colspan="6" class="!bg-gray-50 !px-6 !py-4">
+                    <td colspan="6" class="!bg-ink-50 !px-6 !py-4">
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <h3 class="text-sm font-semibold text-gray-700 mb-2">Itens</h3>
+                          <h3 class="text-sm font-semibold text-ink-700 mb-2">Itens</h3>
                           <table class="admin-table text-xs">
                             <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th>Total</th></tr></thead>
                             <tbody>
@@ -313,17 +533,17 @@ type Tab = 'products' | 'inventory' | 'orders';
                           </table>
                         </div>
                         <div class="space-y-1 text-sm">
-                          <h3 class="text-sm font-semibold text-gray-700 mb-2">Detalhes</h3>
-                          <p><span class="text-gray-500">Cliente:</span> {{ order.user?.name ?? '#' + order.userId }}</p>
-                          <p><span class="text-gray-500">Email:</span> {{ order.user?.email ?? '-' }}</p>
-                          <p><span class="text-gray-500">Criado:</span> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                          @if (order.paidAt) { <p><span class="text-gray-500">Pago:</span> {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</p> }
-                          @if (order.cancelledAt) { <p><span class="text-gray-500">Cancelado:</span> {{ order.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                          <h3 class="text-sm font-semibold text-ink-700 mb-2">Detalhes</h3>
+                          <p><span class="text-ink-500">Cliente:</span> {{ order.user?.name ?? '#' + order.userId }}</p>
+                          <p><span class="text-ink-500">Email:</span> {{ order.user?.email ?? '-' }}</p>
+                          <p><span class="text-ink-500">Criado:</span> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                          @if (order.paidAt) { <p><span class="text-ink-500">Pago:</span> {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</p> }
+                          @if (order.cancelledAt) { <p><span class="text-ink-500">Cancelado:</span> {{ order.cancelledAt | date:'dd/MM/yyyy HH:mm' }}</p> }
                           @if (order.couponCode) {
-                          <p><span class="text-gray-500">Cupom:</span> {{ order.couponCode }} ({{ order.discountType }} {{ order.discountValue }})</p>
+                          <p><span class="text-ink-500">Cupom:</span> {{ order.couponCode }} ({{ order.discountType }} {{ order.discountValue }})</p>
                           }
                           @if (order.shippingAddress) {
-                          <p><span class="text-gray-500">Endereço:</span> {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }} - {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}</p>
+                          <p><span class="text-ink-500">Endereço:</span> {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }} - {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}</p>
                           }
                         </div>
                       </div>
@@ -331,13 +551,13 @@ type Tab = 'products' | 'inventory' | 'orders';
                   </tr>
                   }
                   } @empty {
-                  <tr><td colspan="6" class="text-center text-gray-500 py-6">Nenhum pedido encontrado.</td></tr>
+                  <tr><td colspan="6" class="text-center text-ink-500 py-6">Nenhum pedido encontrado.</td></tr>
                   }
                 </tbody>
               </table>
 
               @if (totalOrderPages > 1) {
-              <div class="flex items-center justify-between mt-4 text-sm text-gray-600">
+              <div class="flex items-center justify-between mt-4 text-sm text-ink-600">
                 <button class="link-btn" type="button" [disabled]="orderPage <= 1" (click)="orderPage = orderPage - 1">← Anterior</button>
                 <span>Página {{ orderPage }} de {{ totalOrderPages }}</span>
                 <button class="link-btn" type="button" [disabled]="orderPage >= totalOrderPages" (click)="orderPage = orderPage + 1">Próximo →</button>
@@ -374,6 +594,9 @@ type Tab = 'products' | 'inventory' | 'orders';
       .qty-btn { width: 20px; height: 20px; border-radius: 3px; border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 0.688rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; line-height: 1; }
       .qty-btn-sm { font-size: 0.625rem; width: 22px; }
       .qty-btn:hover { background: #e5e7eb; }
+      .kpi-card { border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; background: white; }
+      .kpi-label { font-size: 0.75rem; font-weight: 500; color: #6b7280; margin-bottom: 0.25rem; }
+      .kpi-value { font-size: 1.5rem; font-weight: 700; color: #111827; }
     `,
   ],
 })
@@ -387,7 +610,9 @@ export class AdminPage implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
   orders: Order[] = [];
+  coupons: Coupon[] = [];
   movements: StockMovement[] = [];
+  dashboard: DashboardKpis | null = null;
 
   editingProductId: number | null = null;
   selectedCategoryId = '';
@@ -406,6 +631,14 @@ export class AdminPage implements OnInit {
   orderPage = 1;
   ordersPerPage = 10;
   showProductModal = false;
+
+  showCategoryModal = false;
+  editingCategoryId: string | null = null;
+  categoryForm: CategoryPayload = { name: '', slug: '' };
+
+  showCouponModal = false;
+  editingCouponId: number | null = null;
+  couponForm: CouponPayload = this.emptyCouponForm();
 
   constructor(private api: AdminApiService) {}
 
@@ -442,7 +675,7 @@ export class AdminPage implements OnInit {
   refreshAll() {
     this.loading = true;
     this.error = '';
-    let remaining = 3;
+    let remaining = 5;
     const done = () => {
       remaining--;
       if (remaining === 0) this.loading = false;
@@ -451,6 +684,8 @@ export class AdminPage implements OnInit {
     this.api.listProducts().subscribe({ next: (v) => (this.products = v), error: (e) => this.setError(e), complete: done });
     this.api.listCategories().subscribe({ next: (v) => (this.categories = v), error: (e) => this.setError(e), complete: done });
     this.api.listOrders().subscribe({ next: (v) => (this.orders = v), error: (e) => this.setError(e), complete: done });
+    this.api.getDashboard().subscribe({ next: (v) => (this.dashboard = v), error: (e) => this.setError(e), complete: done });
+    this.api.listCoupons().subscribe({ next: (v) => (this.coupons = v), error: (e) => this.setError(e), complete: done });
   }
 
   saveProduct() {
@@ -624,6 +859,146 @@ export class AdminPage implements OnInit {
 
   onComboboxBlur() {
     setTimeout(() => this.closeCombobox(), 150);
+  }
+
+  openCategoryModal() {
+    this.editingCategoryId = null;
+    this.categoryForm = { name: '', slug: '' };
+    this.showCategoryModal = true;
+  }
+
+  closeCategoryModal() {
+    this.showCategoryModal = false;
+    this.editingCategoryId = null;
+    this.categoryForm = { name: '', slug: '' };
+  }
+
+  editCategory(category: Category) {
+    this.editingCategoryId = category.id;
+    this.categoryForm = { name: category.name, slug: category.slug };
+    this.showCategoryModal = true;
+  }
+
+  saveCategory() {
+    if (!this.categoryForm.name.trim()) return;
+    this.saving = true;
+    this.error = '';
+    this.message = '';
+
+    const request = this.editingCategoryId
+      ? this.api.updateCategory(this.editingCategoryId, this.categoryForm)
+      : this.api.createCategory(this.categoryForm);
+
+    request.subscribe({
+      next: () => {
+        this.message = this.editingCategoryId ? 'Categoria atualizada.' : 'Categoria criada.';
+        this.closeCategoryModal();
+        this.api.listCategories().subscribe((v) => (this.categories = v));
+      },
+      error: (e) => this.setError(e),
+      complete: () => (this.saving = false),
+    });
+  }
+
+  deleteCategory(category: Category) {
+    if (!confirm(`Remover a categoria "${category.name}"?`)) return;
+    this.api.deleteCategory(category.id).subscribe({
+      next: () => {
+        this.message = 'Categoria removida.';
+        this.api.listCategories().subscribe((v) => (this.categories = v));
+      },
+      error: (e) => this.setError(e),
+    });
+  }
+
+  openCouponModal() {
+    this.editingCouponId = null;
+    this.couponForm = this.emptyCouponForm();
+    this.showCouponModal = true;
+  }
+
+  closeCouponModal() {
+    this.showCouponModal = false;
+    this.editingCouponId = null;
+  }
+
+  editCoupon(coupon: Coupon) {
+    this.editingCouponId = coupon.id;
+    this.couponForm = {
+      code: coupon.code,
+      type: coupon.type,
+      value: coupon.value,
+      isActive: coupon.isActive,
+      startsAt: this.toDatetimeLocal(coupon.startsAt),
+      expiresAt: this.toDatetimeLocal(coupon.expiresAt),
+      maxRedemptions: coupon.maxRedemptions,
+      maxRedemptionsPerUser: coupon.maxRedemptionsPerUser,
+      minSubtotal: coupon.minSubtotal,
+      maxDiscount: coupon.maxDiscount,
+    };
+    this.showCouponModal = true;
+  }
+
+  saveCoupon() {
+    if (!this.couponForm.code.trim() || !this.couponForm.value) return;
+    this.saving = true;
+    this.error = '';
+    this.message = '';
+
+    const payload = { ...this.couponForm };
+    if (!payload.startsAt) payload.startsAt = null;
+    if (!payload.expiresAt) payload.expiresAt = null;
+    if (payload.maxRedemptions === undefined) payload.maxRedemptions = null;
+    if (payload.maxRedemptionsPerUser === undefined) payload.maxRedemptionsPerUser = null;
+    if (!payload.minSubtotal) payload.minSubtotal = null;
+    if (!payload.maxDiscount) payload.maxDiscount = null;
+
+    const request = this.editingCouponId
+      ? this.api.updateCoupon(this.editingCouponId, payload)
+      : this.api.createCoupon(payload);
+
+    request.subscribe({
+      next: () => {
+        this.message = this.editingCouponId ? 'Cupom atualizado.' : 'Cupom criado.';
+        this.closeCouponModal();
+        this.api.listCoupons().subscribe((v) => (this.coupons = v));
+      },
+      error: (e) => this.setError(e),
+      complete: () => (this.saving = false),
+    });
+  }
+
+  deleteCoupon(coupon: Coupon) {
+    if (!confirm(`Remover o cupom "${coupon.code}"?`)) return;
+    this.api.deleteCoupon(coupon.id).subscribe({
+      next: () => {
+        this.message = 'Cupom removido.';
+        this.api.listCoupons().subscribe((v) => (this.coupons = v));
+      },
+      error: (e) => this.setError(e),
+    });
+  }
+
+  private emptyCouponForm(): CouponPayload {
+    return {
+      code: '',
+      type: 'PERCENT',
+      value: '',
+      isActive: true,
+      startsAt: null,
+      expiresAt: null,
+      maxRedemptions: null,
+      maxRedemptionsPerUser: null,
+      minSubtotal: null,
+      maxDiscount: null,
+    };
+  }
+
+  private toDatetimeLocal(dateStr: string | null): string | null {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().slice(0, 16);
   }
 
   private setError(err: any) {

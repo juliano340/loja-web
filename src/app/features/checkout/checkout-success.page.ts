@@ -17,7 +17,7 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
   template: `
     <section class="page">
       <div class="w-full max-w-2xl">
-        <div class="bg-white border border-gray-200 rounded-lg p-6 sm:p-8">
+        <div class="bg-white border border-ink-100 rounded-lg p-6 sm:p-8">
           <div class="flex items-start gap-4">
             <div
               class="h-12 w-12 rounded-full border flex items-center justify-center shrink-0"
@@ -40,33 +40,33 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
 
             <div class="min-w-0">
               @if (state === 'confirmed') {
-              <h1 class="text-2xl font-semibold text-gray-900">Pedido confirmado</h1>
+              <h1 class="text-2xl font-semibold text-ink-900">Pedido confirmado</h1>
               } @else if (state === 'confirming') {
-              <h1 class="text-2xl font-semibold text-gray-900">Confirmando pagamento…</h1>
+              <h1 class="text-2xl font-semibold text-ink-900">Confirmando pagamento…</h1>
               } @else if (state === 'timeout') {
-              <h1 class="text-2xl font-semibold text-gray-900">Ainda confirmando…</h1>
+              <h1 class="text-2xl font-semibold text-ink-900">Ainda confirmando…</h1>
               } @else {
-              <h1 class="text-2xl font-semibold text-gray-900">Pedido não encontrado</h1>
+              <h1 class="text-2xl font-semibold text-ink-900">Pedido não encontrado</h1>
               } @if (orderId) {
-              <p class="text-sm text-gray-600 mt-2">
+              <p class="text-sm text-ink-600 mt-2">
                 Número do pedido:
-                <span class="font-semibold text-gray-900">#{{ orderId }}</span>
+                <span class="font-semibold text-ink-900">#{{ orderId }}</span>
               </p>
               } @if (state === 'confirming') {
-              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p class="text-sm text-ink-600 mt-2 leading-relaxed">
                 Só um instante — estamos confirmando o pagamento.
               </p>
               } @else if (state === 'confirmed') {
-              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p class="text-sm text-ink-600 mt-2 leading-relaxed">
                 Você já pode acompanhar o status em <span class="font-medium">Meus pedidos</span>.
               </p>
               } @else if (state === 'timeout') {
-              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p class="text-sm text-ink-600 mt-2 leading-relaxed">
                 Às vezes o retorno do pagamento leva alguns segundos a mais. Você pode acompanhar em
                 <span class="font-medium">Meus pedidos</span> ou atualizar esta página.
               </p>
               } @else {
-              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p class="text-sm text-ink-600 mt-2 leading-relaxed">
                 Não encontrei um pedido recente para confirmar.
               </p>
               }
@@ -79,7 +79,7 @@ type PageState = 'confirming' | 'confirmed' | 'timeout' | 'missing';
 
             <a
               routerLink="/products"
-              class="w-full text-center px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+              class="w-full text-center px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
             >
               Continuar comprando
             </a>

@@ -1,9 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+/* =========================
+   DESIGN TOKENS (Tailwind 4)
+========================= */
+@theme {
+    /* Tipografia */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+
+    /* Primária — laranja energético */
+    --color-brand-50: #fff7ed;
+    --color-brand-100: #ffedd5;
+    --color-brand-200: #fed7aa;
+    --color-brand-300: #fdba74;
+    --color-brand-400: #fb923c;
+    --color-brand-500: #f97316;
+    --color-brand-600: #ea580c;
+    --color-brand-700: #c2410c;
+    --color-brand-800: #9a3412;
+    --color-brand-900: #7c2d12;
+
+    /* Acento — verde-limão */
+    --color-accent-50: #f7fee7;
+    --color-accent-100: #ecfccb;
+    --color-accent-200: #d9f99d;
+    --color-accent-300: #bef264;
+    --color-accent-400: #a3e635;
+    --color-accent-500: #84cc16;
+    --color-accent-600: #65a30d;
+    --color-accent-700: #4d7c0f;
+    --color-accent-800: #3f6212;
+    --color-accent-900: #365314;
+
+    /* Tinta — grafite profundo */
+    --color-ink-50: #f6f7f9;
+    --color-ink-100: #eceef1;
+    --color-ink-200: #d5d9e0;
+    --color-ink-300: #b0b8c4;
+    --color-ink-400: #8590a2;
+    --color-ink-500: #667084;
+    --color-ink-600: #515a6b;
+    --color-ink-700: #434b59;
+    --color-ink-800: #272d38;
+    --color-ink-900: #161a21;
+    --color-ink-950: #0b0e13;
+}
 
 /* =========================
    BASE
 ========================= */
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
 
     html,
     body {
@@ -12,7 +62,11 @@
 
     body {
         margin: 0;
-        @apply bg-gray-50 text-gray-900;
+        @apply bg-[#fafaf7] text-ink-900 font-sans antialiased;
+    }
+
+    ::selection {
+        @apply bg-accent-300 text-ink-950;
     }
 }
 
@@ -23,16 +77,13 @@
 
     /* ---------- PAGE ---------- */
     .page {
-        @apply flex items-start justify-center px-4 sm:px-6 pt-10;
-        min-height: calc(100vh - 56px);
-        /* opcional (melhor em mobile moderno):
-       min-height: calc(100dvh - 56px);
-    */
+        @apply flex items-start justify-center px-4 sm:px-6 pt-10 pb-16;
+        min-height: calc(100vh - 64px);
     }
 
     /* ---------- CARD ---------- */
     .card {
-        @apply bg-white border border-gray-200 rounded-lg p-6 w-full max-w-md;
+        @apply bg-white border border-ink-100 rounded-xl p-6 w-full max-w-md shadow-[0_1px_3px_rgba(11,14,19,0.06)];
     }
 
     /* ---------- FORM ---------- */
@@ -40,86 +91,355 @@
         @apply space-y-4;
     }
 
+    .input-label {
+        @apply block text-sm font-medium text-ink-800 mb-1.5;
+    }
+
     .input {
-        @apply block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+        @apply block w-full border border-ink-200 rounded-lg px-3.5 py-2.5 bg-white text-ink-900
+               placeholder:text-ink-400 transition
+               focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
     }
 
     .btn-primary {
-        @apply w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition;
+        @apply w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               bg-brand-600 text-white hover:bg-brand-700
+               focus-visible:ring-brand-600 shadow-sm active:scale-[0.99];
+    }
+
+    .btn-accent {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               bg-accent-500 text-ink-950 hover:bg-accent-400
+               focus-visible:ring-accent-500 shadow-sm active:scale-[0.99];
     }
 
     .btn-secondary {
-        @apply w-full px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition;
+        @apply w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               border border-ink-200 bg-white text-ink-900 hover:bg-ink-50
+               focus-visible:ring-ink-300;
+    }
+
+    .btn-outline {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               border border-brand-600 text-brand-700 bg-white hover:bg-brand-50
+               focus-visible:ring-brand-500;
+    }
+
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               text-ink-700 hover:bg-ink-100 hover:text-ink-900 focus-visible:ring-ink-300;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold
+               transition duration-150 select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+               bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600 shadow-sm;
     }
 
     .btn-danger-ghost {
         @apply text-sm font-medium text-red-600 hover:text-red-700 transition;
     }
 
+    .link-btn {
+        @apply text-sm font-semibold text-brand-700 hover:text-brand-800 underline-offset-4 hover:underline transition;
+    }
+
+    /* ---------- BADGE ---------- */
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    }
+
+    .badge-lime {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-accent-100 text-accent-800;
+    }
+
+    .badge-brand {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 text-brand-800;
+    }
+
+    .badge-ink {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-ink-900 text-white;
+    }
+
+    .badge-neutral {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-ink-100 text-ink-600;
+    }
+
+    .badge-green {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800;
+    }
+
+    .badge-red {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-700;
+    }
+
+    .badge-amber {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-800;
+    }
+
+    /* ---------- SECTION HEADINGS ---------- */
+    .section-kicker {
+        @apply text-xs font-bold uppercase tracking-[0.18em] text-brand-600;
+    }
+
+    .section-title {
+        @apply font-display text-3xl font-extrabold text-ink-950 tracking-tight;
+    }
+
+    .section-subtitle {
+        @apply text-ink-500 mt-2;
+    }
+
+    /* ---------- EMPTY / ERROR STATES ---------- */
+    .empty-state {
+        @apply bg-white border border-dashed border-ink-200 rounded-xl p-8 text-center;
+    }
+
+    .empty-state-title {
+        @apply text-base font-semibold text-ink-900 mb-1;
+    }
+
+    .empty-state-text {
+        @apply text-sm text-ink-500 mb-4;
+    }
+
+    /* ---------- SKELETON ---------- */
+    .skeleton {
+        @apply bg-white border border-ink-100 rounded-xl overflow-hidden relative;
+    }
+
+    .skeleton-shimmer {
+        @apply absolute inset-0 -translate-x-full
+               bg-[linear-gradient(90deg,transparent,rgba(11,14,19,0.06),transparent)]
+               animate-[shimmer_1.4s_infinite];
+    }
+
     /* =========================
-     HEADER (FIX 56px REAL)
+     HEADER
   ========================= */
 
     .header {
-        @apply w-full bg-white border-b border-gray-200 sticky top-0 z-40;
-        height: 56px;
-        /* ✅ garante que bate com a .page */
+        @apply w-full bg-white/90 backdrop-blur border-b border-ink-100 sticky top-0 z-40;
+        height: 64px;
+        box-shadow: 0 1px 0 rgba(11, 14, 19, 0.03);
     }
 
     .header-container {
         @apply max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between relative;
         height: 100%;
-        /* ✅ ocupa os 56px do header */
     }
 
     /* ESQUERDA */
     .header-title {
-        @apply text-base font-semibold text-gray-900;
+        @apply inline-flex items-center gap-2.5 font-display font-extrabold text-lg tracking-tight text-ink-950;
+    }
+
+    .header-logo {
+        @apply flex items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 text-white
+               shadow-sm;
+        width: 36px;
+        height: 36px;
+    }
+
+    .header-logo-mark {
+        @apply font-display font-black text-lg leading-none;
+    }
+
+    .header-brand-accent {
+        @apply text-brand-600;
     }
 
     /* DIREITA */
     .header-right {
-        @apply flex items-center gap-4;
+        @apply flex items-center gap-3;
     }
 
     /* MENU DESKTOP */
     .header-nav {
-        @apply hidden md:flex items-center gap-6;
+        @apply hidden md:flex items-center gap-1;
     }
 
     .header-link {
-        @apply text-sm font-medium text-gray-700 hover:text-blue-600 transition leading-none flex items-center;
-        height: 32px;
-        /* equivalente ao h-8, mas sem depender do h-8 */
+        @apply relative inline-flex items-center px-3 text-sm font-semibold text-ink-600
+               hover:text-ink-950 transition rounded-lg;
+        height: 40px;
+    }
+
+    .header-link-active {
+        @apply text-ink-950;
+    }
+
+    .header-link-active::after {
+        content: '';
+        @apply absolute left-3 right-3 bottom-0 h-0.5 rounded-full bg-brand-600;
     }
 
     /* BOTÕES / ÍCONES */
     .icon-btn {
-        @apply flex items-center justify-center rounded-md text-gray-700 hover:bg-gray-100 transition;
-        height: 32px;
-        /* h-8 */
-        width: 32px;
-        /* w-8 */
+        @apply flex items-center justify-center rounded-lg text-ink-700 hover:bg-ink-100 hover:text-ink-950 transition;
+        height: 40px;
+        width: 40px;
     }
 
     /* BADGE DO CARRINHO */
     .cart-badge {
-        @apply absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center;
+        @apply absolute -top-0.5 -right-0.5 bg-brand-600 text-white text-[11px] font-bold rounded-full
+               flex items-center justify-center border-2 border-white;
         width: 20px;
-        /* w-5 */
         height: 20px;
-        /* h-5 */
         min-width: 20px;
     }
 
-    /* MENU MOBILE (aparece abaixo do header) */
+    /* MENU MOBILE */
     .mobile-menu {
-        @apply absolute left-0 w-full bg-white border-b border-gray-200 shadow-md z-50;
-        top: 56px;
-        /* ✅ casa com header fixo */
+        @apply absolute left-0 w-full bg-white border-b border-ink-100 shadow-xl z-50;
+        top: 64px;
     }
 
     .mobile-menu-item {
-        @apply block px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100;
+        @apply block px-4 py-3 text-sm font-medium text-ink-800 hover:bg-accent-50;
+    }
+
+    /* BARRA DE ANÚNCIO */
+    .announce {
+        @apply bg-ink-950 text-white text-center text-xs font-semibold tracking-wide;
+        padding: 6px 16px;
+    }
+
+    .announce-strong {
+        @apply text-accent-400;
+    }
+
+    /* =========================
+     FOOTER
+  ========================= */
+    .footer {
+        @apply bg-ink-950 text-ink-300 mt-16;
+    }
+
+    .footer-brand {
+        @apply font-display font-extrabold text-lg text-white tracking-tight;
+    }
+
+    .footer-link {
+        @apply block text-sm text-ink-300 hover:text-accent-400 transition py-1;
+    }
+
+    .footer-title {
+        @apply text-xs font-bold uppercase tracking-[0.15em] text-ink-500 mb-3;
+    }
+
+    /* =========================
+     ADMIN
+  ========================= */
+    .sidebar-link {
+        @apply flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg text-sm font-medium
+               text-ink-600 hover:bg-ink-100 hover:text-ink-950 transition;
+    }
+
+    .sidebar-active {
+        @apply bg-brand-50 text-brand-800 font-semibold hover:bg-brand-50 hover:text-brand-800;
+    }
+
+    .admin-table {
+        @apply w-full text-sm;
+    }
+
+    .admin-table th {
+        @apply text-left text-xs font-bold uppercase tracking-wider text-ink-500 px-4 py-3 border-b border-ink-100;
+    }
+
+    .admin-table td {
+        @apply px-4 py-3 border-b border-ink-100 text-ink-800 align-middle;
+    }
+
+    .admin-table tbody tr:hover {
+        @apply bg-ink-50;
+    }
+
+    .tab-btn {
+        @apply px-4 py-2 rounded-lg text-sm font-semibold text-ink-600 hover:bg-ink-100 transition;
+    }
+
+    .tab-btn-active {
+        @apply bg-ink-950 text-white hover:bg-ink-900;
+    }
+
+    .kpi-card {
+        @apply bg-white border border-ink-100 rounded-xl p-5;
+    }
+
+    .kpi-label {
+        @apply text-xs font-semibold uppercase tracking-wider text-ink-500;
+    }
+
+    .kpi-value {
+        @apply font-display text-2xl font-extrabold text-ink-950 mt-1;
+    }
+
+    /* ---------- QUANTITY STEPPER ---------- */
+    .qty-btn {
+        @apply flex items-center justify-center h-9 w-9 rounded-lg border border-ink-200 bg-white
+               text-ink-800 font-bold hover:bg-ink-50 transition select-none cursor-pointer
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500;
+    }
+
+    .qty-btn-sm {
+        @apply flex items-center justify-center h-7 w-7 rounded-md border border-ink-200 bg-white
+               text-ink-800 font-bold hover:bg-ink-50 transition select-none cursor-pointer;
+    }
+
+    /* ---------- MISC ---------- */
+    .vh-56px {
+        min-height: calc(100vh - 56px);
+    }
+
+    .clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-hover {
+        @apply transition duration-200 hover:shadow-[0_12px_28px_rgba(11,14,19,0.10)] hover:-translate-y-1;
+    }
+}
+
+/* =========================
+   ANIMAÇÕES
+========================= */
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

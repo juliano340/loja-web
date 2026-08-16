@@ -20,15 +20,15 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
         <!-- Header -->
         <header class="flex items-start justify-between gap-4 shrink-0">
           <div class="min-w-0">
-            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Meus pedidos</h1>
-            <p class="text-sm text-gray-500 mt-1">
+            <h1 class="text-2xl sm:text-3xl font-semibold text-ink-900">Meus pedidos</h1>
+            <p class="text-sm text-ink-500 mt-1">
               Acompanhe seus pedidos e veja os detalhes de cada compra.
             </p>
           </div>
 
           <button
             type="button"
-            class="hidden sm:inline-flex px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition shrink-0"
+            class="hidden sm:inline-flex px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition shrink-0"
             (click)="goToProducts()"
           >
             Ver produtos
@@ -40,25 +40,25 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
           @if (loading) {
           <div class="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4">
             @for (i of skeletons; track i) {
-            <div class="bg-white border border-gray-200 rounded-lg p-5 animate-pulse">
+            <div class="bg-white border border-ink-100 rounded-lg p-5 animate-pulse">
               <div class="flex items-start justify-between gap-4">
                 <div class="space-y-2 w-full">
-                  <div class="h-4 bg-gray-200 rounded w-44"></div>
-                  <div class="h-3 bg-gray-200 rounded w-72"></div>
-                  <div class="h-3 bg-gray-200 rounded w-56"></div>
+                  <div class="h-4 bg-ink-200 rounded w-44"></div>
+                  <div class="h-3 bg-ink-200 rounded w-72"></div>
+                  <div class="h-3 bg-ink-200 rounded w-56"></div>
                 </div>
-                <div class="h-8 bg-gray-200 rounded w-28"></div>
+                <div class="h-8 bg-ink-200 rounded w-28"></div>
               </div>
               <div class="mt-4 space-y-2">
-                <div class="h-3 bg-gray-200 rounded w-full"></div>
-                <div class="h-3 bg-gray-200 rounded w-5/6"></div>
-                <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                <div class="h-3 bg-ink-200 rounded w-full"></div>
+                <div class="h-3 bg-ink-200 rounded w-5/6"></div>
+                <div class="h-3 bg-ink-200 rounded w-2/3"></div>
               </div>
             </div>
             }
           </div>
           } @else if (error) {
-          <div class="bg-white border border-gray-200 rounded-lg p-6">
+          <div class="bg-white border border-ink-100 rounded-lg p-6">
             <div class="flex items-start gap-4">
               <div
                 class="h-12 w-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center"
@@ -67,15 +67,15 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
               </div>
 
               <div class="flex-1">
-                <h2 class="text-lg font-semibold text-gray-900">
+                <h2 class="text-lg font-semibold text-ink-900">
                   Não foi possível carregar seus pedidos
                 </h2>
-                <p class="text-sm text-gray-600 mt-1">Verifique sua conexão e tente novamente.</p>
+                <p class="text-sm text-ink-600 mt-1">Verifique sua conexão e tente novamente.</p>
 
                 <div class="mt-4 flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
                     (click)="reload()"
                   >
                     Tentar novamente
@@ -83,7 +83,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
 
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
                     (click)="goToProducts()"
                   >
                     Ver produtos
@@ -93,24 +93,24 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
             </div>
           </div>
           } @else if (allOrders.length === 0) {
-          <div class="bg-white border border-gray-200 rounded-lg p-6">
+          <div class="bg-white border border-ink-100 rounded-lg p-6">
             <div class="flex items-start gap-4">
               <div
-                class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl"
+                class="h-12 w-12 rounded-full bg-ink-100 flex items-center justify-center text-xl"
               >
                 📦
               </div>
 
               <div class="flex-1">
-                <h2 class="text-lg font-semibold text-gray-900">Você ainda não fez pedidos</h2>
-                <p class="text-sm text-gray-600 mt-1">
+                <h2 class="text-lg font-semibold text-ink-900">Você ainda não fez pedidos</h2>
+                <p class="text-sm text-ink-600 mt-1">
                   Quando você finalizar uma compra, seus pedidos vão aparecer aqui.
                 </p>
 
                 <div class="mt-4 flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
                     (click)="goToProducts()"
                   >
                     Explorar produtos
@@ -118,7 +118,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
 
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
                     (click)="goHome()"
                   >
                     Voltar para o início
@@ -129,74 +129,74 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
           </div>
           } @else {
           <!-- Controls -->
-          <div class="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shrink-0">
+          <div class="bg-white border border-ink-100 rounded-lg p-3 sm:p-4 shrink-0">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-              <div class="text-sm text-gray-700">
-                <span class="font-semibold text-gray-900">{{ allOrders.length }}</span>
+              <div class="text-sm text-ink-700">
+                <span class="font-semibold text-ink-900">{{ allOrders.length }}</span>
                 pedido(s) no total @if (visibleOrders.length !== allOrders.length) {
-                <span class="text-gray-500"> • mostrando {{ visibleOrders.length }}</span>
+                <span class="text-ink-500"> • mostrando {{ visibleOrders.length }}</span>
                 } @if (isDesktopPaginationEnabled()) {
-                <span class="text-gray-500"> • página {{ currentPage }} de {{ totalPages }}</span>
+                <span class="text-ink-500"> • página {{ currentPage }} de {{ totalPages }}</span>
                 }
               </div>
 
               <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
                 <!-- Filter -->
                 <div
-                  class="inline-flex w-full sm:w-auto rounded-md border border-gray-200 bg-gray-50 p-1"
+                  class="inline-flex w-full sm:w-auto rounded-lg border border-ink-100 bg-ink-50 p-1"
                   role="tablist"
                   aria-label="Filtrar pedidos por status"
                 >
                   <button
                     type="button"
-                    class="px-3 py-2 text-sm font-medium rounded-md transition w-full sm:w-auto"
+                    class="px-3 py-2 text-sm font-medium rounded-lg transition w-full sm:w-auto"
                     [class]="filterBtnClass('ALL')"
                     (click)="setStatusFilter('ALL')"
                     role="tab"
                     [attr.aria-selected]="statusFilter === 'ALL'"
                   >
                     Todos
-                    <span class="ml-2 text-xs font-semibold text-gray-600">({{ counts.all }})</span>
+                    <span class="ml-2 text-xs font-semibold text-ink-600">({{ counts.all }})</span>
                   </button>
 
                   <button
                     type="button"
-                    class="px-3 py-2 text-sm font-medium rounded-md transition w-full sm:w-auto"
+                    class="px-3 py-2 text-sm font-medium rounded-lg transition w-full sm:w-auto"
                     [class]="filterBtnClass('PENDING')"
                     (click)="setStatusFilter('PENDING')"
                     role="tab"
                     [attr.aria-selected]="statusFilter === 'PENDING'"
                   >
                     Pendente
-                    <span class="ml-2 text-xs font-semibold text-gray-600"
+                    <span class="ml-2 text-xs font-semibold text-ink-600"
                       >({{ counts.pending }})</span
                     >
                   </button>
 
                   <button
                     type="button"
-                    class="px-3 py-2 text-sm font-medium rounded-md transition w-full sm:w-auto"
+                    class="px-3 py-2 text-sm font-medium rounded-lg transition w-full sm:w-auto"
                     [class]="filterBtnClass('PAID')"
                     (click)="setStatusFilter('PAID')"
                     role="tab"
                     [attr.aria-selected]="statusFilter === 'PAID'"
                   >
                     Pago
-                    <span class="ml-2 text-xs font-semibold text-gray-600"
+                    <span class="ml-2 text-xs font-semibold text-ink-600"
                       >({{ counts.paid }})</span
                     >
                   </button>
 
                   <button
                     type="button"
-                    class="px-3 py-2 text-sm font-medium rounded-md transition w-full sm:w-auto"
+                    class="px-3 py-2 text-sm font-medium rounded-lg transition w-full sm:w-auto"
                     [class]="filterBtnClass('CANCELLED')"
                     (click)="setStatusFilter('CANCELLED')"
                     role="tab"
                     [attr.aria-selected]="statusFilter === 'CANCELLED'"
                   >
                     Cancelado
-                    <span class="ml-2 text-xs font-semibold text-gray-600"
+                    <span class="ml-2 text-xs font-semibold text-ink-600"
                       >({{ counts.cancelled }})</span
                     >
                   </button>
@@ -207,7 +207,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                   <label class="sr-only" for="ordersSort">Ordenar pedidos</label>
                   <select
                     id="ordersSort"
-                    class="w-full sm:w-56 px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 text-sm
+                    class="w-full sm:w-56 px-3 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 text-sm
                              focus:outline-none focus:ring-2 focus:ring-blue-600"
                     [value]="sort"
                     (change)="setSort($any($event.target).value)"
@@ -225,7 +225,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                   <label class="sr-only" for="ordersPageSize">Itens por página</label>
                   <select
                     id="ordersPageSize"
-                    class="w-full sm:w-40 px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 text-sm
+                    class="w-full sm:w-40 px-3 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 text-sm
                              focus:outline-none focus:ring-2 focus:ring-blue-600"
                     [value]="pageSizeValue"
                     (change)="setPageSize($any($event.target).value)"
@@ -242,25 +242,25 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
 
           <!-- Empty (filtered) -->
           @if (visibleOrders.length === 0) {
-          <div class="bg-white border border-gray-200 rounded-lg p-6">
+          <div class="bg-white border border-ink-100 rounded-lg p-6">
             <div class="flex items-start gap-4">
               <div
-                class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl"
+                class="h-12 w-12 rounded-full bg-ink-100 flex items-center justify-center text-xl"
               >
                 🔎
               </div>
               <div class="flex-1">
-                <h2 class="text-lg font-semibold text-gray-900">Nenhum pedido encontrado</h2>
-                <p class="text-sm text-gray-600 mt-1">
+                <h2 class="text-lg font-semibold text-ink-900">Nenhum pedido encontrado</h2>
+                <p class="text-sm text-ink-600 mt-1">
                   Não há pedidos com o status
-                  <span class="font-semibold text-gray-800">{{ statusLabel(statusFilter) }}</span
+                  <span class="font-semibold text-ink-800">{{ statusLabel(statusFilter) }}</span
                   >.
                 </p>
 
                 <div class="mt-4 flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
                     (click)="setStatusFilter('ALL')"
                   >
                     Ver todos
@@ -268,7 +268,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
 
                   <button
                     type="button"
-                    class="w-full sm:w-auto px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
                     (click)="goToProducts()"
                   >
                     Ver produtos
@@ -281,10 +281,10 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
           <!-- ✅ Lista rola internamente -->
           <div class="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4">
             @for (order of pagedOrders; track order.id) {
-            <article class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <article class="bg-white border border-ink-100 rounded-lg overflow-hidden">
               <button
                 type="button"
-                class="w-full text-left p-5 hover:bg-gray-50 transition"
+                class="w-full text-left p-5 hover:bg-ink-50 transition"
                 (click)="toggle(order.id)"
                 [attr.aria-expanded]="isExpanded(order.id)"
                 [attr.aria-controls]="'order-panel-' + order.id"
@@ -292,7 +292,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                 <div class="flex items-start justify-between gap-4">
                   <div class="min-w-0">
                     <div class="flex items-center gap-3 flex-wrap">
-                      <p class="text-sm font-semibold text-gray-900">Pedido #{{ order.id }}</p>
+                      <p class="text-sm font-semibold text-ink-900">Pedido #{{ order.id }}</p>
 
                       <span
                         class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border"
@@ -302,11 +302,11 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                       </span>
                     </div>
 
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="text-xs text-ink-500 mt-1">
                       Criado em {{ formatDate(order.createdAt) }}
                     </p>
 
-                    <p class="text-xs text-gray-600 mt-2">
+                    <p class="text-xs text-ink-600 mt-2">
                       {{ order.items.length }} item(ns) • Subtotal
                       {{ formatMoney(order.subtotal) }} • Frete
                       {{ formatMoney(order.shippingFee) }}
@@ -316,9 +316,9 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                   </div>
 
                   <div class="shrink-0 text-right">
-                    <p class="text-xs text-gray-500">Total</p>
-                    <p class="text-lg font-bold text-gray-900">{{ formatMoney(order.total) }}</p>
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="text-xs text-ink-500">Total</p>
+                    <p class="text-lg font-bold text-ink-900">{{ formatMoney(order.total) }}</p>
+                    <p class="text-xs text-ink-500 mt-1">
                       @if (isExpanded(order.id)) { Ocultar } @else { Ver detalhes } ▾
                     </p>
                   </div>
@@ -326,26 +326,26 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
               </button>
 
               @if (isExpanded(order.id)) {
-              <div class="border-t border-gray-200 p-5 bg-white" [id]="'order-panel-' + order.id">
+              <div class="border-t border-ink-100 p-5 bg-white" [id]="'order-panel-' + order.id">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <section class="lg:col-span-2">
-                    <h3 class="text-sm font-semibold text-gray-900">Itens</h3>
+                    <h3 class="text-sm font-semibold text-ink-900">Itens</h3>
 
                     <div
-                      class="mt-3 divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden"
+                      class="mt-3 divide-y divide-ink-100 border border-ink-100 rounded-lg overflow-hidden"
                     >
                       @for (item of order.items; track item.id) {
                       <div class="p-4 flex items-start justify-between gap-4">
                         <div class="min-w-0">
-                          <p class="text-sm font-medium text-gray-900 truncate">
+                          <p class="text-sm font-medium text-ink-900 truncate">
                             {{ item.productName }}
                           </p>
-                          <p class="text-xs text-gray-600 mt-1">
+                          <p class="text-xs text-ink-600 mt-1">
                             {{ item.quantity }}x • Unitário {{ formatMoney(item.unitPrice) }}
                           </p>
                         </div>
 
-                        <div class="shrink-0 text-sm font-semibold text-gray-900">
+                        <div class="shrink-0 text-sm font-semibold text-ink-900">
                           {{ formatMoney(lineTotal(item)) }}
                         </div>
                       </div>
@@ -354,18 +354,18 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                   </section>
 
                   <aside class="lg:col-span-1">
-                    <h3 class="text-sm font-semibold text-gray-900">Entrega</h3>
-                    <div class="mt-3 border border-gray-200 rounded-lg p-4 text-sm">
-                      <p class="text-gray-900 font-medium">
+                    <h3 class="text-sm font-semibold text-ink-900">Entrega</h3>
+                    <div class="mt-3 border border-ink-100 rounded-lg p-4 text-sm">
+                      <p class="text-ink-900 font-medium">
                         {{ order.shippingAddress.street }}, {{ order.shippingAddress.number }}
                       </p>
-                      <p class="text-gray-600 mt-1">
+                      <p class="text-ink-600 mt-1">
                         {{ order.shippingAddress.city }}/{{ order.shippingAddress.state }}
                       </p>
-                      <p class="text-gray-600 mt-1">CEP: {{ order.shippingAddress.zip }}</p>
+                      <p class="text-ink-600 mt-1">CEP: {{ order.shippingAddress.zip }}</p>
 
                       @if (order.shippingAddress.complement) {
-                      <p class="text-gray-600 mt-1">
+                      <p class="text-ink-600 mt-1">
                         Complemento: {{ order.shippingAddress.complement }}
                       </p>
                       }
@@ -381,21 +381,21 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
           <!-- ✅ Paginação: só no desktop -->
           @if (isDesktopPaginationEnabled()) {
           <div
-            class="bg-white border border-gray-200 rounded-lg p-4 shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+            class="bg-white border border-ink-100 rounded-lg p-4 shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
           >
-            <div class="text-sm text-gray-700">
+            <div class="text-sm text-ink-700">
               Mostrando
-              <span class="font-semibold text-gray-900">{{ pageStart }}</span>
+              <span class="font-semibold text-ink-900">{{ pageStart }}</span>
               –
-              <span class="font-semibold text-gray-900">{{ pageEnd }}</span>
+              <span class="font-semibold text-ink-900">{{ pageEnd }}</span>
               de
-              <span class="font-semibold text-gray-900">{{ visibleOrders.length }}</span>
+              <span class="font-semibold text-ink-900">{{ visibleOrders.length }}</span>
             </div>
 
             <div class="flex items-center justify-between sm:justify-end gap-2">
               <button
                 type="button"
-                class="px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 (click)="prevPage()"
                 [disabled]="currentPage === 1"
                 aria-label="Página anterior"
@@ -403,14 +403,14 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
                 ← Anterior
               </button>
 
-              <span class="text-sm text-gray-600 px-2">
-                Página <span class="font-semibold text-gray-900">{{ currentPage }}</span> de
-                <span class="font-semibold text-gray-900">{{ totalPages }}</span>
+              <span class="text-sm text-ink-600 px-2">
+                Página <span class="font-semibold text-ink-900">{{ currentPage }}</span> de
+                <span class="font-semibold text-ink-900">{{ totalPages }}</span>
               </span>
 
               <button
                 type="button"
-                class="px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 (click)="nextPage()"
                 [disabled]="currentPage >= totalPages"
                 aria-label="Próxima página"
@@ -425,7 +425,7 @@ type OrderSort = 'NEWEST' | 'OLDEST' | 'TOTAL_DESC' | 'TOTAL_ASC';
           <div class="sm:hidden shrink-0">
             <button
               type="button"
-              class="w-full px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+              class="w-full px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
               (click)="goToProducts()"
             >
               Ver produtos
@@ -654,8 +654,8 @@ export class OrdersPage implements OnInit, OnDestroy {
     const active = this.statusFilter === filter;
     return [
       active
-        ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-        : 'bg-transparent text-gray-700 hover:bg-white/70',
+        ? 'bg-white text-ink-900 shadow-sm border border-ink-100'
+        : 'bg-transparent text-ink-700 hover:bg-white/70',
       'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
     ].join(' ');
   }
@@ -733,7 +733,7 @@ export class OrdersPage implements OnInit, OnDestroy {
       case 'CANCELLED':
         return 'bg-red-50 text-red-900 border-red-200';
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
+        return 'bg-ink-50 text-ink-700 border-ink-100';
     }
   }
 

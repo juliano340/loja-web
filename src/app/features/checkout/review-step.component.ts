@@ -18,13 +18,13 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
   template: `
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h2 class="text-lg font-semibold text-gray-900">Revisão</h2>
-        <p class="text-sm text-gray-500 mt-1">Confirme seus dados antes de finalizar.</p>
+        <h2 class="text-lg font-semibold text-ink-900">Revisão</h2>
+        <p class="text-sm text-ink-500 mt-1">Confirme seus dados antes de finalizar.</p>
       </div>
 
       <button
         type="button"
-        class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+        class="px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
         (click)="checkout.previousStep()"
         [disabled]="loading || couponLoading"
       >
@@ -34,16 +34,16 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
 
     @if (!address || !paymentMethod || cart.items().length === 0) {
     <div
-      class="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+      class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
     >
       Checkout incompleto. Verifique endereço, pagamento e carrinho.
     </div>
     } @else {
-    <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+    <div class="mt-6 rounded-lg border border-ink-100 bg-white p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="text-sm font-semibold text-gray-900">Endereço</div>
-          <div class="text-sm text-gray-600 mt-1 leading-relaxed">
+          <div class="text-sm font-semibold text-ink-900">Endereço</div>
+          <div class="text-sm text-ink-600 mt-1 leading-relaxed">
             {{ address.street }}, {{ address.number }} @if (address.complement) {
             <span> — {{ address.complement }}</span> }
             <br />
@@ -53,7 +53,7 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
 
         <button
           type="button"
-          class="text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+          class="text-sm font-medium text-brand-600 hover:text-blue-700 transition"
           (click)="checkout.goTo(1)"
           [disabled]="loading || couponLoading"
         >
@@ -62,27 +62,27 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
       </div>
     </div>
 
-    <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+    <div class="mt-4 rounded-lg border border-ink-100 bg-white p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="text-sm font-semibold text-gray-900">Pagamento</div>
-          <div class="text-sm text-gray-600 mt-1">
+          <div class="text-sm font-semibold text-ink-900">Pagamento</div>
+          <div class="text-sm text-ink-600 mt-1">
             {{ paymentLabel(paymentMethod) }}
           </div>
 
           @if (coupon) {
-          <div class="text-sm text-gray-600 mt-1">
+          <div class="text-sm text-ink-600 mt-1">
             Cupom:
-            <span class="font-medium text-gray-900">{{ coupon }}</span>
+            <span class="font-medium text-ink-900">{{ coupon }}</span>
 
             @if (couponLoading) {
-            <span class="text-xs text-gray-500"> • validando...</span>
+            <span class="text-xs text-ink-500"> • validando...</span>
             } @else if (couponPreviewError) {
             <span class="text-xs text-red-700"> • {{ couponPreviewError }}</span>
             } @else if (discount() > 0) {
-            <span class="text-xs text-gray-500"> • desconto {{ money(discount()) }}</span>
+            <span class="text-xs text-ink-500"> • desconto {{ money(discount()) }}</span>
             } @else {
-            <span class="text-xs text-gray-500"> • sem desconto</span>
+            <span class="text-xs text-ink-500"> • sem desconto</span>
             }
           </div>
           }
@@ -90,7 +90,7 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
 
         <button
           type="button"
-          class="text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+          class="text-sm font-medium text-brand-600 hover:text-blue-700 transition"
           (click)="checkout.goTo(2)"
           [disabled]="loading || couponLoading"
         >
@@ -99,57 +99,57 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
       </div>
     </div>
 
-    <div class="mt-4 rounded-lg border border-gray-200 bg-white">
-      <div class="p-4 border-b border-gray-200">
-        <div class="text-sm font-semibold text-gray-900">Itens</div>
+    <div class="mt-4 rounded-lg border border-ink-100 bg-white">
+      <div class="p-4 border-b border-ink-100">
+        <div class="text-sm font-semibold text-ink-900">Itens</div>
       </div>
 
       <div class="p-4 space-y-3">
         @for (item of cart.items(); track item.product.id) {
         <div class="flex items-center justify-between gap-4">
           <div class="min-w-0">
-            <div class="text-sm font-medium text-gray-900 truncate">
+            <div class="text-sm font-medium text-ink-900 truncate">
               {{ item.product.name }}
             </div>
-            <div class="text-xs text-gray-500 mt-1">
+            <div class="text-xs text-ink-500 mt-1">
               {{ item.quantity }}x • {{ money(unitPrice(item)) }}
             </div>
           </div>
-          <div class="text-sm font-semibold text-gray-900">
+          <div class="text-sm font-semibold text-ink-900">
             {{ money(lineTotal(item)) }}
           </div>
         </div>
         }
 
-        <div class="h-px bg-gray-200 my-2"></div>
+        <div class="h-px bg-ink-200 my-2"></div>
 
         <div class="space-y-2 text-sm">
           <div class="flex items-center justify-between">
-            <span class="text-gray-600">Subtotal</span>
-            <span class="font-medium text-gray-900">{{ money(subtotal()) }}</span>
+            <span class="text-ink-600">Subtotal</span>
+            <span class="font-medium text-ink-900">{{ money(subtotal()) }}</span>
           </div>
 
           <div class="flex items-center justify-between">
-            <span class="text-gray-600">Frete</span>
-            <span class="font-medium text-gray-900">{{ money(shippingFeeEstimate()) }}</span>
+            <span class="text-ink-600">Frete</span>
+            <span class="font-medium text-ink-900">{{ money(shippingFeeEstimate()) }}</span>
           </div>
 
           @if (coupon && !couponLoading && !couponPreviewError && discount() > 0) {
           <div class="flex items-center justify-between">
-            <span class="text-gray-600">Desconto</span>
+            <span class="text-ink-600">Desconto</span>
             <span class="font-medium text-green-700">- {{ money(discount()) }}</span>
           </div>
           }
 
-          <div class="flex items-center justify-between pt-2 border-t border-gray-200">
-            <span class="text-gray-900 font-semibold">Total</span>
-            <span class="text-gray-900 font-bold">
+          <div class="flex items-center justify-between pt-2 border-t border-ink-100">
+            <span class="text-ink-900 font-semibold">Total</span>
+            <span class="text-ink-900 font-bold">
               @if (coupon && couponLoading) { — } @else { {{ money(total()) }} }
             </span>
           </div>
 
           @if (coupon && !couponLoading && couponPreviewError) {
-          <div class="text-xs text-gray-500 pt-1">
+          <div class="text-xs text-ink-500 pt-1">
             O pedido ainda pode ser finalizado, mas o cupom será ignorado se continuar inválido.
           </div>
           }
@@ -168,7 +168,7 @@ type CheckoutSessionResponse = { url: string; sessionId: string };
     </button>
 
     @if (error) {
-    <div class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+    <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
       {{ error }}
     </div>
     } }

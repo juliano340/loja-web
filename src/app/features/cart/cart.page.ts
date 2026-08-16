@@ -10,20 +10,20 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <section class="min-h-[calc(100vh-56px)] flex items-start justify-center pt-10 px-4 sm:px-6">
+    <section class="min-h-[calc(100vh-64px)] flex items-start justify-center pt-10 pb-16 px-4 sm:px-6">
       <div class="w-full max-w-5xl space-y-6">
         <!-- Alert: tentou iniciar checkout com carrinho vazio -->
         @if (showEmptyCheckoutNotice && cart.items().length === 0) {
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div class="flex items-start justify-between gap-4">
             <div class="text-sm text-amber-900">
-              <span class="font-semibold">Não dá pra iniciar o checkout</span> com o carrinho vazio.
+              <span class="font-bold">Não dá pra iniciar o checkout</span> com o carrinho vazio.
               Adicione pelo menos um item para continuar.
             </div>
 
             <button
               type="button"
-              class="text-sm font-medium text-amber-900/80 hover:text-amber-900 transition"
+              class="text-sm font-semibold text-amber-900/80 hover:text-amber-900 transition"
               (click)="dismissEmptyCheckoutNotice()"
               aria-label="Fechar aviso"
             >
@@ -36,13 +36,14 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
         <!-- Topbar -->
         <header class="flex items-start justify-between gap-4">
           <div>
-            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Carrinho</h1>
-            <p class="text-sm text-gray-500 mt-1">Revise seus itens antes de finalizar a compra.</p>
+            <p class="section-kicker">Sua compra</p>
+            <h1 class="section-title !text-3xl">Carrinho</h1>
+            <p class="text-sm text-ink-500 mt-1">Revise seus itens antes de finalizar a compra.</p>
           </div>
 
           <button
             type="button"
-            class="hidden sm:inline-flex px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            class="btn-secondary !hidden sm:!inline-flex"
             (click)="goToProducts()"
           >
             Continuar comprando
@@ -51,32 +52,25 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
 
         @if (cart.items().length === 0) {
         <!-- Empty state -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6">
-          <div class="flex items-start gap-4">
+        <div class="empty-state !p-10">
+          <div class="flex items-start gap-4 max-w-md mx-auto text-left">
             <div
-              class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl"
+              class="h-14 w-14 rounded-2xl bg-brand-100 flex items-center justify-center text-2xl shrink-0"
+              aria-hidden="true"
             >
               🛒
             </div>
 
             <div class="flex-1">
-              <h2 class="text-lg font-semibold text-gray-900">Seu carrinho está vazio</h2>
-              <p class="text-sm text-gray-600 mt-1">Adicione produtos para continuar.</p>
+              <h2 class="text-lg font-bold text-ink-950">Seu carrinho está vazio</h2>
+              <p class="text-sm text-ink-500 mt-1">Adicione produtos para continuar.</p>
 
-              <div class="mt-4 flex flex-col sm:flex-row gap-3">
-                <button
-                  type="button"
-                  class="w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition sm:w-auto"
-                  (click)="goToProducts()"
-                >
+              <div class="mt-5 flex flex-col sm:flex-row gap-3">
+                <button type="button" class="btn-primary sm:!w-auto" (click)="goToProducts()">
                   Ver produtos
                 </button>
 
-                <button
-                  type="button"
-                  class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition sm:w-auto"
-                  (click)="goHome()"
-                >
+                <button type="button" class="btn-secondary sm:!w-auto" (click)="goHome()">
                   Voltar para o início
                 </button>
               </div>
@@ -86,19 +80,18 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
         } @else {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Items -->
-          <div class="bg-white border border-gray-200 rounded-lg p-6 lg:col-span-2">
+          <div class="bg-white border border-ink-100 rounded-2xl p-6 lg:col-span-2 shadow-[0_1px_3px_rgba(11,14,19,0.06)]">
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-900">Itens</h2>
-              <span class="text-sm text-gray-500"> {{ cart.totalItems() }} unidade(s) </span>
+              <h2 class="font-display text-lg font-extrabold text-ink-950">Itens</h2>
+              <span class="badge-ink"> {{ cart.totalItems() }} unidade(s) </span>
             </div>
 
-            <div class="mt-4 divide-y divide-gray-200">
+            <div class="mt-5 divide-y divide-ink-100">
               @for (item of cart.items(); track item.product.id) {
               <div class="py-4 flex gap-4">
-                <!-- Image vira link -->
                 <a
-                  class="h-20 w-20 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 block cursor-pointer
-                             hover:border-gray-300 hover:bg-gray-100 transition"
+                  class="h-20 w-20 rounded-xl bg-ink-50 border border-ink-100 overflow-hidden shrink-0 block cursor-pointer
+                             hover:border-brand-300 transition"
                   [routerLink]="['/products', item.product.id]"
                   aria-label="Abrir produto"
                 >
@@ -111,9 +104,7 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
                     referrerpolicy="no-referrer"
                   />
                   } @else {
-                  <div
-                    class="h-full w-full flex items-center justify-center text-gray-400 text-xs font-medium"
-                  >
+                  <div class="h-full w-full flex items-center justify-center text-ink-400 text-xs font-medium">
                     Sem imagem
                   </div>
                   }
@@ -121,29 +112,19 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
 
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-4">
-                    <div class="min-w-0 flex-1">
-                      <a
-                        [routerLink]="['/products', item.product.id]"
-                        class="block w-full font-medium text-gray-900 truncate cursor-pointer
-                                   hover:underline decoration-gray-300 underline-offset-4 transition"
-                        [title]="item.product.name"
-                        aria-label="Abrir produto"
-                      >
-                        {{ item.product.name }}
-                      </a>
+                    <a
+                      [routerLink]="['/products', item.product.id]"
+                      class="block font-semibold text-ink-950 truncate cursor-pointer
+                                 hover:text-brand-700 transition"
+                      [title]="item.product.name"
+                      aria-label="Abrir produto"
+                    >
+                      {{ item.product.name }}
+                    </a>
 
-                      <p class="text-sm text-gray-500 mt-1">
-                        Unitário:
-                        <span class="text-gray-700">R$ {{ money(item.product.price) }}</span>
-                      </p>
-                    </div>
-
-                    <!-- ✅ hit-area maior sem mudar visual -->
                     <button
                       type="button"
-                      class="shrink-0 -mr-2 -mt-1 px-2 py-1 rounded-md
-                                 text-sm font-medium text-red-600
-                                 hover:text-red-700 hover:bg-red-50 transition"
+                      class="shrink-0 text-sm font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg px-2 py-1 transition"
                       (click)="openRemoveConfirm(item.product.id)"
                       aria-label="Remover item"
                     >
@@ -151,40 +132,26 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
                     </button>
                   </div>
 
-                  <div class="mt-3 flex items-center justify-between gap-4">
-                    <!-- Qty stepper -->
-                    <div
-                      class="inline-flex items-center rounded-md border border-gray-200 bg-white overflow-hidden"
-                    >
-                      <button
-                        type="button"
-                        class="h-9 w-9 grid place-items-center hover:bg-gray-50 transition"
-                        (click)="decrease(item.product.id)"
-                        aria-label="Diminuir quantidade"
-                      >
-                        —
-                      </button>
+                  <p class="text-sm text-ink-500 mt-1">
+                    Unitário: <span class="text-ink-800">R$ {{ money(item.product.price) }}</span>
+                  </p>
 
-                      <div
-                        class="h-9 px-3 grid place-items-center text-sm font-semibold text-gray-900"
-                      >
+                  <div class="mt-3 flex items-center justify-between gap-4">
+                    <div class="inline-flex items-center rounded-lg border border-ink-200 overflow-hidden">
+                      <button type="button" class="qty-btn-sm rounded-none border-0" (click)="decrease(item.product.id)" aria-label="Diminuir quantidade">
+                        −
+                      </button>
+                      <div class="h-7 px-3 flex items-center text-sm font-bold text-ink-950">
                         {{ item.quantity }}
                       </div>
-
-                      <button
-                        type="button"
-                        class="h-9 w-9 grid place-items-center hover:bg-gray-50 transition"
-                        (click)="increase(item.product.id)"
-                        aria-label="Aumentar quantidade"
-                      >
+                      <button type="button" class="qty-btn-sm rounded-none border-0" (click)="increase(item.product.id)" aria-label="Aumentar quantidade">
                         +
                       </button>
                     </div>
 
-                    <!-- Subtotal -->
                     <div class="text-right">
-                      <p class="text-xs text-gray-500">Subtotal</p>
-                      <p class="text-base font-semibold text-gray-900">
+                      <p class="text-xs text-ink-500">Subtotal</p>
+                      <p class="text-base font-bold text-brand-700">
                         R$ {{ money(lineTotal(item.quantity, item.product.price)) }}
                       </p>
                     </div>
@@ -194,66 +161,48 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
               }
             </div>
 
-            <div
-              class="mt-4 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between"
-            >
-              <button
-                type="button"
-                class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
-                (click)="goToProducts()"
-              >
+            <div class="mt-5 pt-4 border-t border-ink-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+              <button type="button" class="btn-secondary sm:!w-auto !text-sm" (click)="goToProducts()">
                 + Adicionar mais itens
               </button>
 
-              <button
-                type="button"
-                class="px-4 py-2 rounded-md text-gray-600 hover:text-gray-900 transition"
-                (click)="openClearConfirm()"
-              >
+              <button type="button" class="btn-danger-ghost" (click)="openClearConfirm()">
                 Limpar carrinho
               </button>
             </div>
           </div>
 
           <!-- Summary -->
-          <aside class="bg-white border border-gray-200 rounded-lg p-6 lg:col-span-1 h-fit">
-            <h2 class="text-lg font-semibold text-gray-900">Resumo</h2>
+          <aside class="bg-white border border-ink-100 rounded-2xl p-6 lg:col-span-1 h-fit shadow-[0_1px_3px_rgba(11,14,19,0.06)] sticky top-24">
+            <h2 class="font-display text-lg font-extrabold text-ink-950">Resumo</h2>
 
-            <div class="mt-4 space-y-3">
+            <div class="mt-5 space-y-3">
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600">Subtotal</span>
-                <span class="font-medium text-gray-900">R$ {{ money(cart.totalPrice()) }}</span>
+                <span class="text-ink-500">Subtotal</span>
+                <span class="font-bold text-ink-900">R$ {{ money(cart.totalPrice()) }}</span>
               </div>
 
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600">Frete</span>
-                <span class="text-gray-500">Calculado no checkout</span>
+                <span class="text-ink-500">Frete</span>
+                <span class="badge-lime">Calculado no checkout</span>
               </div>
 
-              <div class="border-t border-gray-200 pt-3 flex items-center justify-between">
-                <span class="text-gray-900 font-semibold">Total</span>
-                <span class="text-xl font-bold text-gray-900">
+              <div class="border-t border-ink-100 pt-4 flex items-center justify-between">
+                <span class="font-bold text-ink-950">Total</span>
+                <span class="font-display text-2xl font-black text-brand-600">
                   R$ {{ money(cart.totalPrice()) }}
                 </span>
               </div>
 
-              <button
-                type="button"
-                class="w-full px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
-                (click)="goToCheckout()"
-              >
+              <button type="button" class="btn-primary" (click)="goToCheckout()">
                 Finalizar compra
               </button>
 
-              <button
-                type="button"
-                class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition w-full"
-                (click)="goToProducts()"
-              >
+              <button type="button" class="btn-secondary" (click)="goToProducts()">
                 Continuar comprando
               </button>
 
-              <p class="text-xs text-gray-500 leading-relaxed">
+              <p class="text-xs text-ink-500 leading-relaxed text-center">
                 Login só será exigido ao entrar no checkout.
               </p>
             </div>
@@ -263,7 +212,7 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
       </div>
     </section>
 
-    <!-- MODAL PREMIUM (reutilizado) -->
+    <!-- MODAL PREMIUM -->
     @if (confirmOpen) {
     <div
       class="fixed inset-0 z-[60] flex items-center justify-center px-4"
@@ -271,43 +220,21 @@ type ConfirmAction = 'REMOVE_ITEM' | 'CLEAR_CART';
       aria-modal="true"
       aria-label="Confirmação"
     >
-      <div class="absolute inset-0 bg-black/40" (click)="closeConfirm()"></div>
+      <div class="absolute inset-0 bg-ink-950/50 backdrop-blur-sm" (click)="closeConfirm()"></div>
 
-      <div
-        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
-      >
+      <div class="relative w-full max-w-sm rounded-2xl bg-white border border-ink-100 shadow-2xl p-6">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <h2 class="text-base font-semibold text-gray-900">{{ confirmTitle }}</h2>
-            <p class="text-sm text-gray-600 mt-1">
-              {{ confirmMessage }}
-            </p>
+            <h2 class="text-base font-bold text-ink-950">{{ confirmTitle }}</h2>
+            <p class="text-sm text-ink-500 mt-1">{{ confirmMessage }}</p>
           </div>
-
-          <button
-            type="button"
-            class="text-gray-500 hover:text-gray-700 transition"
-            (click)="closeConfirm()"
-            aria-label="Fechar"
-          >
-            ✕
-          </button>
         </div>
 
-        <div class="mt-5 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
-            (click)="closeConfirm()"
-          >
+        <div class="mt-6 flex items-center justify-end gap-3">
+          <button type="button" class="btn-secondary !w-auto !py-2" (click)="closeConfirm()">
             Cancelar
           </button>
-
-          <button
-            type="button"
-            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-            (click)="confirm()"
-          >
+          <button type="button" class="btn-danger" (click)="confirm()">
             {{ confirmCta }}
           </button>
         </div>

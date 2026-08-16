@@ -13,15 +13,15 @@ import { RouterLink } from '@angular/router';
         <!-- Back link premium -->
         <a
           routerLink="/products"
-          class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition"
+          class="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-ink-900 transition"
         >
           ← Voltar para produtos
         </a>
 
         <!-- Header -->
         <header>
-          <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Meu perfil</h1>
-          <p class="text-sm text-gray-500 mt-1">
+          <h1 class="text-2xl sm:text-3xl font-semibold text-ink-900">Meu perfil</h1>
+          <p class="text-sm text-ink-500 mt-1">
             Atualize seus dados de conta. As alterações valem para seus próximos pedidos.
           </p>
         </header>
@@ -30,31 +30,31 @@ import { RouterLink } from '@angular/router';
         @if (!ready) {
         <div class="card">
           <div class="space-y-3">
-            <div class="h-5 w-44 bg-gray-100 rounded"></div>
+            <div class="h-5 w-44 bg-ink-100 rounded"></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="h-10 w-full bg-gray-100 rounded"></div>
-              <div class="h-10 w-full bg-gray-100 rounded"></div>
+              <div class="h-10 w-full bg-ink-100 rounded"></div>
+              <div class="h-10 w-full bg-ink-100 rounded"></div>
             </div>
-            <div class="h-10 w-56 bg-gray-100 rounded"></div>
+            <div class="h-10 w-56 bg-ink-100 rounded"></div>
           </div>
         </div>
         } @else {
         <div class="card">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">Dados da conta</h2>
-              <p class="text-sm text-gray-500 mt-1">
+              <h2 class="text-lg font-semibold text-ink-900">Dados da conta</h2>
+              <p class="text-sm text-ink-500 mt-1">
                 Confirme se está tudo certo para facilitar seu checkout.
               </p>
             </div>
 
-            <span class="text-xs text-gray-500">ID: {{ auth.user()?.id ?? '—' }}</span>
+            <span class="text-xs text-ink-500">ID: {{ auth.user()?.id ?? '—' }}</span>
           </div>
 
           <!-- ✅ Confirmação de sucesso (premium + auto-dismiss) -->
           @if (success) {
           <div
-            class="mt-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+            class="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
             role="status"
             aria-live="polite"
           >
@@ -84,7 +84,7 @@ import { RouterLink } from '@angular/router';
           <form class="mt-5 space-y-5" (ngSubmit)="save()" #profileForm="ngForm">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">
+                <label class="text-sm font-medium text-ink-700">
                   Nome <span class="text-red-600">*</span>
                 </label>
 
@@ -106,7 +106,7 @@ import { RouterLink } from '@angular/router';
               </div>
 
               <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">
+                <label class="text-sm font-medium text-ink-700">
                   E-mail <span class="text-red-600">*</span>
                 </label>
 
@@ -134,9 +134,9 @@ import { RouterLink } from '@angular/router';
                 <!-- Salvar -->
                 <button
                   type="submit"
-                  class="inline-flex items-center justify-center h-10 px-4 rounded-md
-                           bg-blue-600 text-white text-sm font-medium
-                           hover:bg-blue-700 transition
+                  class="inline-flex items-center justify-center h-10 px-4 rounded-lg
+                           bg-brand-600 text-white text-sm font-medium
+                           hover:bg-brand-700 transition
                            disabled:opacity-60 disabled:cursor-not-allowed"
                   [disabled]="!profileForm.valid || !hasChanges || saving"
                 >
@@ -146,9 +146,9 @@ import { RouterLink } from '@angular/router';
                 <!-- Desfazer -->
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center h-10 px-4 rounded-md
-                           border border-gray-300 bg-white text-gray-900 text-sm font-medium
-                           hover:bg-gray-50 transition
+                  class="inline-flex items-center justify-center h-10 px-4 rounded-lg
+                           border border-ink-200 bg-white text-ink-900 text-sm font-medium
+                           hover:bg-ink-50 transition
                            disabled:opacity-60 disabled:cursor-not-allowed"
                   (click)="discardChanges()"
                   [disabled]="!hasChanges || saving"
@@ -159,20 +159,20 @@ import { RouterLink } from '@angular/router';
                 <!-- Alterar senha -->
                 <a
                   routerLink="/profile/password"
-                  class="inline-flex items-center justify-center h-10 px-4 rounded-md
-                           border border-gray-300 bg-white text-gray-900 text-sm font-medium
-                           hover:bg-gray-50 transition"
+                  class="inline-flex items-center justify-center h-10 px-4 rounded-lg
+                           border border-ink-200 bg-white text-ink-900 text-sm font-medium
+                           hover:bg-ink-50 transition"
                 >
                   Alterar senha
                 </a>
               </div>
 
-              <span class="text-xs text-gray-500 sm:ml-auto">
+              <span class="text-xs text-ink-500 sm:ml-auto">
                 @if (!hasChanges) { Nenhuma alteração pendente. } @else { Alterações não salvas. }
               </span>
             </div>
 
-            <p class="text-xs text-gray-500 leading-relaxed">
+            <p class="text-xs text-ink-500 leading-relaxed">
               Dica: use um e-mail válido para receber atualizações sobre seus pedidos.
             </p>
           </form>

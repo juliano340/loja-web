@@ -10,7 +10,7 @@ import { Product } from '../../../core/services/products.service';
   imports: [CommonModule],
   template: `
     <article
-      class="pc-card"
+      class="pc-card card-hover group"
       role="link"
       tabindex="0"
       [attr.aria-label]="'Abrir produto: ' + (product.name || 'Produto')"
@@ -19,6 +19,14 @@ import { Product } from '../../../core/services/products.service';
       (keydown.space)="openProduct(); $event.preventDefault()"
     >
       <div class="pc-media">
+        @if (categoryName) {
+        <span class="pc-cat badge-lime">{{ categoryName }}</span>
+        }
+
+        @if (product.stock <= 0) {
+        <span class="pc-stock badge-red">Esgotado</span>
+        }
+
         <img
           class="pc-img"
           [src]="imageUrl(product)"
@@ -34,8 +42,6 @@ import { Product } from '../../../core/services/products.service';
 
           @if (product.description) {
           <p class="pc-desc clamp-2">{{ product.description }}</p>
-          } @else {
-          <p class="pc-desc pc-desc--muted">Sem descrição.</p>
           }
         </div>
 
@@ -45,9 +51,15 @@ import { Product } from '../../../core/services/products.service';
           <button
             type="button"
             class="pc-btn"
+            [disabled]="product.stock <= 0"
             (click)="addToCart($event)"
             aria-label="Adicionar ao carrinho"
           >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="9" cy="21" r="1.5" />
+              <circle cx="20" cy="21" r="1.5" />
+              <path d="M1.5 2.5h2.2l2.1 12.1a2.2 2.2 0 0 0 2.2 1.8h9.7a2.2 2.2 0 0 0 2.2-1.7l1.2-7.3H6.1" />
+            </svg>
             Adicionar
           </button>
         </div>
@@ -61,6 +73,10 @@ export class ProductCardComponent {
 
   constructor(private router: Router, private cart: CartService) {}
 
+  get categoryName(): string {
+    return this.product.categories?.[0]?.name ?? '';
+  }
+
   openProduct() {
     this.router.navigate(['/products', this.product.id]);
   }
@@ -73,8 +89,6 @@ export class ProductCardComponent {
     if (typeof anyCart.add === 'function') return anyCart.add(this.product);
     if (typeof anyCart.addItem === 'function') return anyCart.addItem(this.product);
     if (typeof anyCart.addToCart === 'function') return anyCart.addToCart(this.product);
-
-    console.warn('CartService não possui método add/addItem/addToCart.');
   }
 
   formatPrice(value: any): string {

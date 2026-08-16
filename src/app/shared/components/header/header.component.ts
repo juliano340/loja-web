@@ -1,45 +1,67 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink],
-  template: `<header class="header">
+  imports: [RouterLink, RouterLinkActive],
+  host: {
+    '(document:click)': 'onDocClick()',
+    '(document:keydown.escape)': 'onEsc()',
+  },
+  template: `
+    <div class="announce">
+      🔥 <span class="announce-strong">Frete grátis</span> em compras acima de R$ 199 · Pagamento via PIX com
+      <span class="announce-strong">desconto</span>
+    </div>
+
+    <header class="header">
       <div class="header-container">
         <!-- ESQUERDA -->
-        <a routerLink="/" class="header-title" (click)="closeAll()"> Loja Web </a>
+        <a routerLink="/" class="header-title" (click)="closeAll()">
+          <span class="header-logo" aria-hidden="true">
+            <span class="header-logo-mark">L</span>
+          </span>
+          LOJA <span class="header-brand-accent">WEB</span>
+        </a>
 
         <!-- DIREITA -->
         <div class="header-right">
           <!-- MENU DESKTOP -->
-          <nav class="header-nav">
-            <a routerLink="/products" class="header-link" (click)="closeAll()">Produtos</a>
+          <nav class="header-nav" aria-label="Navegação principal">
+            <a
+              routerLink="/products"
+              routerLinkActive="header-link-active"
+              class="header-link"
+              (click)="closeAll()"
+              >Produtos</a
+            >
 
             @if (auth.isAdmin()) {
-            <a routerLink="/admin" class="header-link" (click)="closeAll()">Admin</a>
+            <a routerLink="/admin" routerLinkActive="header-link-active" class="header-link" (click)="closeAll()"
+              >Admin</a
+            >
             }
 
             <!-- PERFIL (dropdown) - desktop -->
             <div class="relative flex items-center gap-2">
               @if (auth.isAuthenticated()) {
-              <span class="hidden md:inline text-sm text-gray-600 select-none">
-                Olá, <span class="font-medium text-gray-900">{{ displayName }}!</span>
+              <span class="hidden md:inline text-sm text-ink-600 select-none">
+                Olá, <span class="font-semibold text-ink-950">{{ displayName }}</span>
               </span>
               }
 
               <button
                 type="button"
                 class="icon-btn"
-                [class.ring-1]="auth.isAuthenticated()"
-                [class.ring-blue-100]="auth.isAuthenticated()"
+                [class.ring-2]="auth.isAuthenticated()"
+                [class.ring-accent-300]="auth.isAuthenticated()"
                 (click)="toggleProfileMenu($event)"
                 aria-label="Menu do perfil"
                 [attr.aria-expanded]="profileOpen"
               >
-                <!-- user outline -->
                 <svg
                   class="h-5 w-5"
                   viewBox="0 0 24 24"
@@ -57,14 +79,14 @@ import { AuthService } from '../../../core/services/auth.service';
 
               @if (profileOpen) {
               <div
-                class="absolute right-0 top-full mt-2 w-52 rounded-lg border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
+                class="absolute right-0 top-full mt-2 w-56 rounded-xl border border-ink-100 bg-white shadow-xl overflow-hidden z-50"
                 role="menu"
                 aria-label="Opções do perfil"
               >
                 @if (auth.isAuthenticated()) {
                 <a
                   routerLink="/profile"
-                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  class="block px-4 py-2.5 text-sm text-ink-800 hover:bg-accent-50 transition"
                   role="menuitem"
                   (click)="closeAll()"
                 >
@@ -73,7 +95,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
                 <a
                   routerLink="/orders"
-                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  class="block px-4 py-2.5 text-sm text-ink-800 hover:bg-accent-50 transition"
                   role="menuitem"
                   (click)="closeAll()"
                 >
@@ -83,7 +105,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 @if (auth.isAdmin()) {
                 <a
                   routerLink="/admin"
-                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  class="block px-4 py-2.5 text-sm text-ink-800 hover:bg-accent-50 transition"
                   role="menuitem"
                   (click)="closeAll()"
                 >
@@ -91,11 +113,11 @@ import { AuthService } from '../../../core/services/auth.service';
                 </a>
                 }
 
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-ink-100"></div>
 
                 <button
                   type="button"
-                  class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                  class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
                   role="menuitem"
                   (click)="openLogoutConfirm()"
                 >
@@ -104,7 +126,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 } @else {
                 <a
                   routerLink="/login"
-                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  class="block px-4 py-2.5 text-sm text-ink-800 hover:bg-accent-50 transition"
                   role="menuitem"
                   (click)="closeAll()"
                 >
@@ -113,11 +135,11 @@ import { AuthService } from '../../../core/services/auth.service';
 
                 <a
                   routerLink="/register"
-                  class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition"
+                  class="block px-4 py-2.5 text-sm text-ink-800 hover:bg-accent-50 transition"
                   role="menuitem"
                   (click)="closeAll()"
                 >
-                  Cadastrar
+                  Criar conta
                 </a>
                 }
               </div>
@@ -132,7 +154,6 @@ import { AuthService } from '../../../core/services/auth.service';
             aria-label="Carrinho"
             (click)="closeAll()"
           >
-            <!-- shopping cart outline -->
             <svg
               class="h-5 w-5"
               viewBox="0 0 24 24"
@@ -151,22 +172,28 @@ import { AuthService } from '../../../core/services/auth.service';
             </svg>
 
             @if (cart.totalItems() > 0) {
-            <span class="cart-badge">
-              {{ cart.totalItems() }}
-            </span>
+            <span class="cart-badge">{{ cart.totalItems() }}</span>
             }
           </a>
 
           <!-- BOTÃO MOBILE -->
-          <button class="icon-btn md:hidden" (click)="toggleMenu()" aria-label="Menu">☰</button>
+          <button class="icon-btn md:hidden" (click)="toggleMenu()" aria-label="Abrir menu">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              @if (menuOpen) {
+              <path d="M6 6l12 12M18 6L6 18" />
+              } @else {
+              <path d="M4 7h16M4 12h16M4 17h16" />
+              }
+            </svg>
+          </button>
         </div>
 
         <!-- MENU MOBILE -->
         @if (menuOpen) {
         <div class="mobile-menu md:hidden">
           @if (auth.isAuthenticated()) {
-          <div class="px-4 py-3 border-b border-gray-200 text-sm text-gray-700">
-            Olá, <span class="font-medium text-gray-900">{{ displayName }}!</span>
+          <div class="px-4 py-3 border-b border-ink-100 text-sm text-ink-600">
+            Olá, <span class="font-semibold text-ink-950">{{ displayName }}</span>
           </div>
           }
 
@@ -182,8 +209,8 @@ import { AuthService } from '../../../core/services/auth.service';
             Sair
           </button>
           } @else {
-          <a routerLink="/login" class="mobile-menu-item" (click)="closeAll()"> Login </a>
-          <a routerLink="/register" class="mobile-menu-item" (click)="closeAll()"> Cadastrar </a>
+          <a routerLink="/login" class="mobile-menu-item" (click)="closeAll()"> Entrar </a>
+          <a routerLink="/register" class="mobile-menu-item" (click)="closeAll()"> Criar conta </a>
           }
         </div>
         }
@@ -198,35 +225,34 @@ import { AuthService } from '../../../core/services/auth.service';
       aria-modal="true"
       aria-label="Confirmação de saída"
     >
-      <!-- overlay -->
-      <div class="absolute inset-0 bg-black/40" (click)="closeLogoutConfirm()"></div>
+      <div class="absolute inset-0 bg-ink-950/50 backdrop-blur-sm" (click)="closeLogoutConfirm()"></div>
 
-      <!-- modal -->
       <div
-        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
+        class="relative w-full max-w-sm rounded-2xl bg-white border border-ink-100 shadow-2xl p-6"
       >
         <div class="flex items-start justify-between gap-3">
-          <div>
-            <h2 class="text-base font-semibold text-gray-900">Deseja realmente sair?</h2>
-            <p class="text-sm text-gray-600 mt-1">
-              Você precisará fazer login novamente para acessar checkout e pedidos.
-            </p>
+          <div class="flex items-start gap-3">
+            <span
+              class="flex items-center justify-center h-10 w-10 rounded-full bg-red-100 text-red-600"
+              aria-hidden="true"
+            >
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M9.5 2h5M12 14v-4M7.5 21h9a2 2 0 0 0 2-2V5.5a2 2 0 0 0-2-2h-9a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2z" />
+              </svg>
+            </span>
+            <div>
+              <h2 class="text-base font-bold text-ink-950">Deseja realmente sair?</h2>
+              <p class="text-sm text-ink-500 mt-1">
+                Você precisará fazer login novamente para acessar checkout e pedidos.
+              </p>
+            </div>
           </div>
-
-          <button
-            type="button"
-            class="text-gray-500 hover:text-gray-700 transition"
-            (click)="closeLogoutConfirm()"
-            aria-label="Fechar"
-          >
-            ✕
-          </button>
         </div>
 
-        <div class="mt-5 flex items-center justify-end gap-3">
+        <div class="mt-6 flex items-center justify-end gap-3">
           <button
             type="button"
-            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            class="px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-800 font-semibold hover:bg-ink-50 transition"
             (click)="closeLogoutConfirm()"
           >
             Cancelar
@@ -234,7 +260,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <button
             type="button"
-            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition"
             (click)="confirmLogout()"
           >
             Sair
@@ -258,7 +284,6 @@ export class HeaderComponent implements OnDestroy {
   constructor(public cart: CartService, public auth: AuthService, private router: Router) {}
 
   ngOnDestroy(): void {
-    // garante que não deixa o body travado ao destruir o componente
     this.unlockBodyScroll();
   }
 
@@ -296,14 +321,10 @@ export class HeaderComponent implements OnDestroy {
     this.router.navigate(['/']);
   }
 
-  // fecha dropdown ao clicar fora (mas não mexe no modal)
-  @HostListener('document:click')
   onDocClick() {
     if (this.profileOpen) this.profileOpen = false;
   }
 
-  // ESC fecha modal se aberto; senão fecha menus
-  @HostListener('document:keydown.escape')
   onEsc() {
     if (this.confirmLogoutOpen) {
       this.closeLogoutConfirm();
@@ -319,11 +340,9 @@ export class HeaderComponent implements OnDestroy {
     const body = document.body;
     const docEl = document.documentElement;
 
-    // salva estado atual
     this.prevBodyOverflow = body.style.overflow;
     this.prevBodyPaddingRight = body.style.paddingRight;
 
-    // evita "pulo" quando some a scrollbar
     const scrollbarWidth = window.innerWidth - docEl.clientWidth;
     if (scrollbarWidth > 0) {
       body.style.paddingRight = `${scrollbarWidth}px`;
@@ -344,8 +363,6 @@ export class HeaderComponent implements OnDestroy {
   }
 
   get displayName(): string {
-    // Ajuste conforme o que o AuthService expõe.
-    // Fallbacks comuns:
     const user: any =
       (this.auth as any).user?.() ??
       (this.auth as any).currentUser?.() ??
@@ -355,6 +372,6 @@ export class HeaderComponent implements OnDestroy {
 
     const name = user?.name ?? user?.fullName ?? user?.firstName ?? user?.email ?? '';
 
-    return String(name || 'usuário').split(' ')[0]; // pega só o primeiro nome
+    return String(name || 'usuário').split(' ')[0];
   }
 }

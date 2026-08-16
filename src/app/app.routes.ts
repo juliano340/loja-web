@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { HomePage } from './features/home/home.page';
 import { ProductsPage } from './features/products/products.page';
 import { CartPage } from './features/cart/cart.page';
 import { LoginPage } from './features/auth/login.page';
@@ -13,7 +14,7 @@ import { nonEmptyCartGuard } from './core/guards/non-empty-cart.guard';
 import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'products', pathMatch: 'full' },
+  { path: '', component: HomePage, pathMatch: 'full' },
 
   { path: 'login', component: LoginPage, canActivate: [guestGuard] },
   { path: 'register', component: RegisterPage, canActivate: [guestGuard] },

@@ -16,13 +16,13 @@ type CouponPreviewResponse = {
   template: `
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h2 class="text-lg font-semibold text-gray-900">Pagamento</h2>
-        <p class="text-sm text-gray-500 mt-1">Escolha a forma de pagamento.</p>
+        <h2 class="text-lg font-semibold text-ink-900">Pagamento</h2>
+        <p class="text-sm text-ink-500 mt-1">Escolha a forma de pagamento.</p>
       </div>
 
       <button
         type="button"
-        class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+        class="px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
         (click)="checkout.previousStep()"
       >
         Voltar
@@ -31,66 +31,66 @@ type CouponPreviewResponse = {
 
     @if (!checkout.address()) {
     <div
-      class="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+      class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
     >
       Endereço não informado. Volte e preencha para continuar.
     </div>
     } @else if (cart.items().length === 0) {
     <div
-      class="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+      class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
     >
       Seu carrinho está vazio.
     </div>
     } @else {
 
     <div class="mt-6">
-      <div class="text-sm font-semibold text-gray-900 mb-3">Forma de pagamento</div>
+      <div class="text-sm font-semibold text-ink-900 mb-3">Forma de pagamento</div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <button
           type="button"
-          class="px-4 py-3 rounded-md border transition text-left"
+          class="px-4 py-3 rounded-lg border transition text-left"
           [class]="
-            isSelected('pix') ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+            isSelected('pix') ? 'border-blue-600 bg-blue-50' : 'border-ink-100 hover:bg-ink-50'
           "
           (click)="select('pix')"
         >
-          <div class="font-semibold text-gray-900">PIX</div>
-          <div class="text-xs text-gray-500 mt-1">Aprovação rápida</div>
+          <div class="font-semibold text-ink-900">PIX</div>
+          <div class="text-xs text-ink-500 mt-1">Aprovação rápida</div>
         </button>
 
         <button
           type="button"
-          class="px-4 py-3 rounded-md border transition text-left"
+          class="px-4 py-3 rounded-lg border transition text-left"
           [class]="
-            isSelected('card') ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+            isSelected('card') ? 'border-blue-600 bg-blue-50' : 'border-ink-100 hover:bg-ink-50'
           "
           (click)="select('card')"
         >
-          <div class="font-semibold text-gray-900">Cartão</div>
-          <div class="text-xs text-gray-500 mt-1">Crédito / Débito</div>
+          <div class="font-semibold text-ink-900">Cartão</div>
+          <div class="text-xs text-ink-500 mt-1">Crédito / Débito</div>
         </button>
 
         <button
           type="button"
-          class="px-4 py-3 rounded-md border transition text-left"
+          class="px-4 py-3 rounded-lg border transition text-left"
           [class]="
-            isSelected('cash') ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+            isSelected('cash') ? 'border-blue-600 bg-blue-50' : 'border-ink-100 hover:bg-ink-50'
           "
           (click)="select('cash')"
         >
-          <div class="font-semibold text-gray-900">Na entrega</div>
-          <div class="text-xs text-gray-500 mt-1">Pague ao receber</div>
+          <div class="font-semibold text-ink-900">Na entrega</div>
+          <div class="text-xs text-ink-500 mt-1">Pague ao receber</div>
         </button>
       </div>
     </div>
 
     <!-- Cupom -->
-    <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+    <div class="mt-6 rounded-lg border border-ink-100 bg-white p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="text-sm font-semibold text-gray-900">Cupom</div>
-          <p class="text-xs text-gray-500 mt-1">Digite o código e clique em “Aplicar”.</p>
+          <div class="text-sm font-semibold text-ink-900">Cupom</div>
+          <p class="text-xs text-ink-500 mt-1">Digite o código e clique em “Aplicar”.</p>
         </div>
 
         @if (appliedCoupon) {
@@ -116,7 +116,7 @@ type CouponPreviewResponse = {
 
         <button
           type="button"
-          class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition sm:w-auto
+          class="px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition sm:w-auto
                      disabled:opacity-60 disabled:cursor-not-allowed"
           (click)="applyCoupon()"
           [disabled]="!couponDraft.trim() || couponLoading"
@@ -129,7 +129,7 @@ type CouponPreviewResponse = {
       <div class="mt-3 text-sm text-red-700">{{ couponError }}</div>
       } } @else {
       <div
-        class="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900"
+        class="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900"
       >
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0">
@@ -144,8 +144,8 @@ type CouponPreviewResponse = {
 
           <button
             type="button"
-            class="shrink-0 px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm font-medium
-                       hover:bg-gray-50 transition"
+            class="shrink-0 px-3 py-1.5 rounded-lg border border-ink-200 bg-white text-ink-900 text-sm font-medium
+                       hover:bg-ink-50 transition"
             (click)="removeCoupon()"
             aria-label="Remover cupom"
           >
@@ -157,34 +157,34 @@ type CouponPreviewResponse = {
     </div>
 
     <!-- Totais -->
-    <div class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+    <div class="mt-6 rounded-lg border border-ink-100 bg-ink-50 p-4">
       <div class="space-y-2 text-sm">
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">Subtotal</span>
-          <span class="font-medium text-gray-900">{{ money(subtotal()) }}</span>
+          <span class="text-ink-600">Subtotal</span>
+          <span class="font-medium text-ink-900">{{ money(subtotal()) }}</span>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">Frete</span>
-          <span class="font-medium text-gray-900">{{ money(shippingFeeEstimate()) }}</span>
+          <span class="text-ink-600">Frete</span>
+          <span class="font-medium text-ink-900">{{ money(shippingFeeEstimate()) }}</span>
         </div>
 
         @if (discount() > 0) {
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">Desconto</span>
+          <span class="text-ink-600">Desconto</span>
           <span class="font-medium text-green-700">- {{ money(discount()) }}</span>
         </div>
         }
 
-        <div class="h-px bg-gray-200 my-2"></div>
+        <div class="h-px bg-ink-200 my-2"></div>
 
         <div class="flex items-center justify-between">
-          <span class="text-gray-900 font-semibold">Total</span>
-          <span class="text-gray-900 font-bold">{{ money(total()) }}</span>
+          <span class="text-ink-900 font-semibold">Total</span>
+          <span class="text-ink-900 font-bold">{{ money(total()) }}</span>
         </div>
       </div>
 
-      <p class="text-xs text-gray-500 mt-3">
+      <p class="text-xs text-ink-500 mt-3">
         O valor do frete segue a mesma regra do backend (RS: R$ 15, outros: R$ 25, acima de R$ 200:
         grátis).
       </p>
@@ -200,8 +200,8 @@ type CouponPreviewResponse = {
     </button>
 
     @if (!checkout.paymentMethod()) {
-    <div class="mt-3 text-xs text-gray-500">
-      <span class="text-blue-600">*</span> Selecione um método de pagamento para continuar.
+    <div class="mt-3 text-xs text-ink-500">
+      <span class="text-brand-600">*</span> Selecione um método de pagamento para continuar.
     </div>
     } }
   `,

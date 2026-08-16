@@ -19,12 +19,12 @@ type ViaCepResponse = {
   imports: [FormsModule],
   template: `
     <div>
-      <h2 class="text-lg font-semibold text-gray-900">Endereço</h2>
+      <h2 class="text-lg font-semibold text-ink-900">Endereço</h2>
     </div>
 
     @if (cepError) {
     <div
-      class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+      class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
     >
       {{ cepError }}
     </div>
@@ -33,8 +33,8 @@ type ViaCepResponse = {
     <form class="form mt-5" (ngSubmit)="submit()" #form="ngForm">
       <!-- Nome (opcional) -->
       <div class="space-y-2">
-        <label class="text-sm font-medium text-gray-700">
-          Nome completo <span class="text-xs text-gray-500 font-normal">(opcional)</span>
+        <label class="text-sm font-medium text-ink-700">
+          Nome completo <span class="text-xs text-ink-500 font-normal">(opcional)</span>
         </label>
         <input
           class="input"
@@ -49,8 +49,8 @@ type ViaCepResponse = {
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- CEP -->
         <div class="space-y-2 sm:col-span-1">
-          <label class="text-sm font-medium text-gray-700">
-            CEP <span class="text-blue-600">*</span>
+          <label class="text-sm font-medium text-ink-700">
+            CEP <span class="text-brand-600">*</span>
           </label>
 
           <div class="relative">
@@ -69,7 +69,7 @@ type ViaCepResponse = {
             />
 
             @if (cepLoading) {
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">…</span>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-500">…</span>
             }
           </div>
 
@@ -80,8 +80,8 @@ type ViaCepResponse = {
 
         <!-- UF -->
         <div class="space-y-2 sm:col-span-1">
-          <label class="text-sm font-medium text-gray-700">
-            UF <span class="text-blue-600">*</span>
+          <label class="text-sm font-medium text-ink-700">
+            UF <span class="text-brand-600">*</span>
           </label>
           <input
             class="input"
@@ -103,8 +103,8 @@ type ViaCepResponse = {
 
         <!-- Cidade -->
         <div class="space-y-2 sm:col-span-1">
-          <label class="text-sm font-medium text-gray-700">
-            Cidade <span class="text-blue-600">*</span>
+          <label class="text-sm font-medium text-ink-700">
+            Cidade <span class="text-brand-600">*</span>
           </label>
           <input
             class="input"
@@ -127,8 +127,8 @@ type ViaCepResponse = {
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- Rua -->
         <div class="space-y-2 sm:col-span-2">
-          <label class="text-sm font-medium text-gray-700">
-            Rua <span class="text-blue-600">*</span>
+          <label class="text-sm font-medium text-ink-700">
+            Rua <span class="text-brand-600">*</span>
           </label>
           <input
             class="input"
@@ -149,8 +149,8 @@ type ViaCepResponse = {
 
         <!-- Número -->
         <div class="space-y-2 sm:col-span-1">
-          <label class="text-sm font-medium text-gray-700">
-            Número <span class="text-blue-600">*</span>
+          <label class="text-sm font-medium text-ink-700">
+            Número <span class="text-brand-600">*</span>
           </label>
           <input
             class="input"
@@ -171,8 +171,8 @@ type ViaCepResponse = {
 
       <!-- Complemento (opcional) -->
       <div class="space-y-2">
-        <label class="text-sm font-medium text-gray-700">
-          Complemento <span class="text-xs text-gray-500 font-normal">(opcional)</span>
+        <label class="text-sm font-medium text-ink-700">
+          Complemento <span class="text-xs text-ink-500 font-normal">(opcional)</span>
         </label>
         <input
           class="input"
@@ -194,13 +194,13 @@ type ViaCepResponse = {
         <button
           type="button"
           (click)="openClearConfirm()"
-          class="sm:w-auto px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+          class="sm:w-auto px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
         >
           Limpar endereço
         </button>
 
-        <span class="text-xs text-gray-500 sm:ml-auto">
-          <span class="text-blue-600">*</span> obrigatórios
+        <span class="text-xs text-ink-500 sm:ml-auto">
+          <span class="text-brand-600">*</span> obrigatórios
         </span>
       </div>
     </form>
@@ -213,20 +213,20 @@ type ViaCepResponse = {
       aria-modal="true"
       aria-label="Confirmação"
     >
-      <div class="absolute inset-0 bg-black/40" (click)="closeConfirm()"></div>
+      <div class="absolute inset-0 bg-ink-950/50" (click)="closeConfirm()"></div>
 
       <div
-        class="relative w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-xl p-5"
+        class="relative w-full max-w-sm rounded-xl bg-white border border-ink-100 shadow-xl p-5"
       >
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <h2 class="text-base font-semibold text-gray-900">{{ confirmTitle }}</h2>
-            <p class="text-sm text-gray-600 mt-1">{{ confirmMessage }}</p>
+            <h2 class="text-base font-semibold text-ink-900">{{ confirmTitle }}</h2>
+            <p class="text-sm text-ink-600 mt-1">{{ confirmMessage }}</p>
           </div>
 
           <button
             type="button"
-            class="text-gray-500 hover:text-gray-700 transition"
+            class="text-ink-500 hover:text-ink-700 transition"
             (click)="closeConfirm()"
             aria-label="Fechar"
           >
@@ -237,7 +237,7 @@ type ViaCepResponse = {
         <div class="mt-5 flex items-center justify-end gap-3">
           <button
             type="button"
-            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition"
+            class="px-4 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 hover:bg-ink-50 transition"
             (click)="closeConfirm()"
           >
             Cancelar
@@ -245,7 +245,7 @@ type ViaCepResponse = {
 
           <button
             type="button"
-            class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
             (click)="confirmClearAddress()"
           >
             Limpar
