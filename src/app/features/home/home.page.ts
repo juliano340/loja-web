@@ -117,9 +117,9 @@ import { CategoriesService, Category } from '../../core/services/categories.serv
       </div>
 
       @if (loading) {
-      <div class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+      <div class="grid gap-5" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
         @for (i of skeleton; track i) {
-        <div class="skeleton h-[320px]">
+        <div class="skeleton h-[340px]">
           <div class="skeleton-shimmer"></div>
         </div>
         }
@@ -133,6 +133,34 @@ import { CategoriesService, Category } from '../../core/services/categories.serv
       }
     </section>
 
+    <!-- COMO FUNCIONA -->
+    <section class="bg-ink-50 py-14">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-10">
+          <p class="section-kicker">Simples e rapido</p>
+          <h2 class="section-title">Como funciona</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="mx-auto h-14 w-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-black">1</div>
+            <h3 class="mt-4 font-display font-bold text-ink-950">Escolha seus produtos</h3>
+            <p class="mt-2 text-sm text-ink-500 leading-relaxed">Navegue pelo catalogo, filtre por categoria e encontre o que precisa pro seu treino.</p>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto h-14 w-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-black">2</div>
+            <h3 class="mt-4 font-display font-bold text-ink-950">Finalize no checkout</h3>
+            <p class="mt-2 text-sm text-ink-500 leading-relaxed">Pague via PIX ou cartao pelo Stripe. Pagamento 100% seguro e criptografado.</p>
+          </div>
+          <div class="text-center">
+            <div class="mx-auto h-14 w-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl font-black">3</div>
+            <h3 class="mt-4 font-display font-bold text-ink-950">Receba em casa</h3>
+            <p class="mt-2 text-sm text-ink-500 leading-relaxed">Envio rapido com frete gratis acima de R$ 199. Acompanhe seu pedido pelo painel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CATEGORIAS -->
     @if (categories.length > 0) {
     <section class="bg-ink-950 py-14 text-white">
@@ -142,29 +170,137 @@ import { CategoriesService, Category } from '../../core/services/categories.serv
           <h2 class="font-display text-3xl font-extrabold tracking-tight">Categorias</h2>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           @for (cat of categories; track cat.id) {
           <a
             routerLink="/products"
             [queryParams]="{ categoria: cat.slug }"
-            class="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-6 py-5 transition hover:bg-white/10 hover:border-accent-500/40"
+            class="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-4 transition hover:bg-white/10 hover:border-accent-500/40"
           >
             <div>
-              <p class="font-display text-lg font-bold">{{ cat.name }}</p>
-              <p class="text-sm text-ink-400 mt-0.5">{{ categoryCount(cat.id) }} produto(s)</p>
+              <p class="font-display font-bold">{{ cat.name }}</p>
+              <p class="text-xs text-ink-400 mt-0.5">{{ categoryCount(cat.id) }} produto(s)</p>
             </div>
             <span
-              class="flex items-center justify-center h-10 w-10 rounded-full bg-accent-500 text-ink-950 group-hover:translate-x-1 transition"
+              class="flex items-center justify-center h-8 w-8 rounded-full bg-accent-500 text-ink-950 group-hover:translate-x-1 transition text-xs"
               aria-hidden="true"
-            >
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-            </span>
+            >→</span>
           </a>
           }
         </div>
       </div>
     </section>
     }
+
+    <!-- DEPOIMENTOS -->
+    <section class="py-14 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-10">
+          <p class="section-kicker">Quem ja comprou</p>
+          <h2 class="section-title">Depoimentos</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="rounded-2xl border border-ink-100 p-6 bg-white">
+            <div class="flex items-center gap-1 text-brand-500 text-sm mb-3">★★★★★</div>
+            <p class="text-sm text-ink-600 leading-relaxed">"Comprei o kit de elasticos e a bola pilates. Qualidade incrivel pelo preco. Entrega foi super rapida, chegou em 3 dias uteis!"</p>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold">MC</div>
+              <div>
+                <p class="text-sm font-bold text-ink-950">Mariana Costa</p>
+                <p class="text-xs text-ink-400">Fisioterapeuta</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-ink-100 p-6 bg-white">
+            <div class="flex items-center gap-1 text-brand-500 text-sm mb-3">★★★★★</div>
+            <p class="text-sm text-ink-600 leading-relaxed">"O percussor de massagem e sensacional. Uso todo dia pos-treino. O site e facil de navegar e o pagamento via PIX foi instantaneo."</p>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-accent-100 text-accent-700 flex items-center justify-center text-sm font-bold">RS</div>
+              <div>
+                <p class="text-sm font-bold text-ink-950">Rafael Silva</p>
+                <p class="text-xs text-ink-400">Personal Trainer</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-ink-100 p-6 bg-white">
+            <div class="flex items-center gap-1 text-brand-500 text-sm mb-3">★★★★★</div>
+            <p class="text-sm text-ink-600 leading-relaxed">"Ja pedi 3 vezes e sempre chegou certinho. O halter regulavel e muito bom, economiza espaco. Recomendo demais!"</p>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="h-9 w-9 rounded-full bg-ink-100 text-ink-700 flex items-center justify-center text-sm font-bold">AL</div>
+              <div>
+                <p class="text-sm font-bold text-ink-950">Ana Luisa</p>
+                <p class="text-xs text-ink-400">Aluna de Crossfit</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-14 bg-ink-50">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-10">
+          <p class="section-kicker">Duvidas?</p>
+          <h2 class="section-title">Perguntas frequentes</h2>
+        </div>
+
+        <div class="space-y-4">
+          <details class="group rounded-2xl bg-white border border-ink-100 overflow-hidden">
+            <summary class="px-6 py-4 cursor-pointer font-bold text-ink-950 text-sm hover:bg-ink-50 transition select-none list-none flex items-center justify-between">
+              Quais formas de pagamento voces aceitam?
+              <span class="text-ink-400 group-open:rotate-45 transition text-xl">+</span>
+            </summary>
+            <div class="px-6 pb-4 text-sm text-ink-600 leading-relaxed">
+              Aceitamos PIX (com desconto), cartao de credito e debito via Stripe. O pagamento e 100% seguro com criptografia SSL.
+            </div>
+          </details>
+
+          <details class="group rounded-2xl bg-white border border-ink-100 overflow-hidden">
+            <summary class="px-6 py-4 cursor-pointer font-bold text-ink-950 text-sm hover:bg-ink-50 transition select-none list-none flex items-center justify-between">
+              O frete e gratis?
+              <span class="text-ink-400 group-open:rotate-45 transition text-xl">+</span>
+            </summary>
+            <div class="px-6 pb-4 text-sm text-ink-600 leading-relaxed">
+              Sim! Frete gratis para compras acima de R$ 199. Para valores abaixo, o frete e calculado no checkout baseado no seu CEP.
+            </div>
+          </details>
+
+          <details class="group rounded-2xl bg-white border border-ink-100 overflow-hidden">
+            <summary class="px-6 py-4 cursor-pointer font-bold text-ink-950 text-sm hover:bg-ink-50 transition select-none list-none flex items-center justify-between">
+              Em quanto tempo recebo meu pedido?
+              <span class="text-ink-400 group-open:rotate-45 transition text-xl">+</span>
+            </summary>
+            <div class="px-6 pb-4 text-sm text-ink-600 leading-relaxed">
+              O prazo medio e de 3 a 7 dias uteis dependendo da sua regiao. Voce acompanha o rastreio pelo painel de pedidos.
+            </div>
+          </details>
+
+          <details class="group rounded-2xl bg-white border border-ink-100 overflow-hidden">
+            <summary class="px-6 py-4 cursor-pointer font-bold text-ink-950 text-sm hover:bg-ink-50 transition select-none list-none flex items-center justify-between">
+              Posso trocar ou devolver um produto?
+              <span class="text-ink-400 group-open:rotate-45 transition text-xl">+</span>
+            </summary>
+            <div class="px-6 pb-4 text-sm text-ink-600 leading-relaxed">
+              Sim! Voce tem 7 dias uteis para solicitar troca ou devolucao de produtos com defeito. Entre em contato pelo e-mail ou WhatsApp.
+            </div>
+          </details>
+
+          <details class="group rounded-2xl bg-white border border-ink-100 overflow-hidden">
+            <summary class="px-6 py-4 cursor-pointer font-bold text-ink-950 text-sm hover:bg-ink-50 transition select-none list-none flex items-center justify-between">
+              Preciso criar conta pra comprar?
+              <span class="text-ink-400 group-open:rotate-45 transition text-xl">+</span>
+            </summary>
+            <div class="px-6 pb-4 text-sm text-ink-600 leading-relaxed">
+              Nao! Voce so precisa criar conta (ou fazer login) quando for finalizar o checkout. Pode navegar e adicionar produtos ao carrinho sem cadastro.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
 
     <!-- CTA FINAL -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
@@ -217,8 +353,8 @@ export class HomePage implements OnInit {
   }
 
   get featured(): Product[] {
-    const active = this.products.filter((p) => p.stock > 0).slice(0, 4);
-    return active.length ? active : this.products.slice(0, 4);
+    const active = this.products.filter((p) => p.stock > 0).slice(0, 8);
+    return active.length ? active : this.products.slice(0, 8);
   }
 
   get totalStock(): number {
