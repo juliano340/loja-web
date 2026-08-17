@@ -78,7 +78,6 @@
     /* ---------- PAGE ---------- */
     .page {
         @apply flex items-start justify-center px-4 sm:px-6 pt-10 pb-16;
-        min-height: calc(100vh - 64px);
     }
 
     /* ---------- CARD ---------- */
