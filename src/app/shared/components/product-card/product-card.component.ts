@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Product } from '../../../core/services/products.service';
 
 @Component({
@@ -71,6 +72,8 @@ import { Product } from '../../../core/services/products.service';
 export class ProductCardComponent {
   @Input({ required: true }) product!: Product;
 
+  private toast = inject(ToastService);
+
   constructor(private router: Router, private cart: CartService) {}
 
   get categoryName(): string {
@@ -86,9 +89,11 @@ export class ProductCardComponent {
 
     const anyCart = this.cart as any;
 
-    if (typeof anyCart.add === 'function') return anyCart.add(this.product);
-    if (typeof anyCart.addItem === 'function') return anyCart.addItem(this.product);
-    if (typeof anyCart.addToCart === 'function') return anyCart.addToCart(this.product);
+    if (typeof anyCart.add === 'function') anyCart.add(this.product);
+    else if (typeof anyCart.addItem === 'function') anyCart.addItem(this.product);
+    else if (typeof anyCart.addToCart === 'function') anyCart.addToCart(this.product);
+
+    this.toast.show(`${this.product.name} adicionado ao carrinho!`, 'success');
   }
 
   formatPrice(value: any): string {
